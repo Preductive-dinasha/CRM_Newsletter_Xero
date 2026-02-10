@@ -37,3 +37,15 @@ externalPort = 80
 [deployment]
 deploymentTarget = "autoscale"
 run = ["gunicorn", "--bind=0.0.0.0:5000", "--reuse-port", "app:app"]
+
+[userenv]
+
+[userenv.shared]
+
+[userenv.development]
+AI_INTEGRATIONS_OPENAI_BASE_URL = "s"
+AI_INTEGRATIONS_OPENAI_API_KEY = "s"
+
+[userenv.production]
+AI_INTEGRATIONS_OPENAI_BASE_URL = "s"
+AI_INTEGRATIONS_OPENAI_API_KEY = "s"
