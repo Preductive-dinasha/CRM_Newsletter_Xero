@@ -5,18 +5,18 @@
 }
 
 :root {
-    --bg-primary: #0f0f0f;
-    --bg-secondary: #1a1a1a;
-    --bg-tertiary: #242424;
-    --bg-hover: #2a2a2a;
-    --text-primary: #e8e8e8;
-    --text-secondary: #a0a0a0;
-    --text-muted: #666;
-    --accent: #6366f1;
-    --accent-hover: #818cf8;
-    --accent-dim: rgba(99, 102, 241, 0.15);
-    --border: #2a2a2a;
-    --border-light: #333;
+    --bg-primary: #F9F9F9;
+    --bg-secondary: #FFFFFF;
+    --bg-tertiary: #F0F0F0;
+    --bg-hover: #E8E8E8;
+    --text-primary: #0A222C;
+    --text-secondary: #4A6069;
+    --text-muted: #8A9BA2;
+    --accent: #308AD8;
+    --accent-hover: #2576BD;
+    --accent-dim: rgba(48, 138, 216, 0.12);
+    --border: #E0E0E0;
+    --border-light: #D0D0D0;
     --success: #22c55e;
     --error: #ef4444;
     --warning: #f59e0b;
@@ -24,7 +24,7 @@
     --radius-md: 12px;
     --radius-lg: 16px;
     --radius-xl: 20px;
-    --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
 body {
@@ -255,7 +255,7 @@ body {
 }
 
 .message-bubble code {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.06);
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 13px;
@@ -263,7 +263,7 @@ body {
 }
 
 .message-bubble pre {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.06);
     padding: 12px 16px;
     border-radius: var(--radius-sm);
     overflow-x: auto;
@@ -290,13 +290,21 @@ body {
 }
 
 .message-bubble th {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.04);
     font-weight: 600;
 }
 
 .message-bubble a {
     color: var(--accent-hover);
     text-decoration: underline;
+}
+
+.message.user .message-bubble code {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.message.user .message-bubble pre {
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .message.user .message-bubble a {
@@ -334,7 +342,7 @@ body {
     align-items: center;
     gap: 6px;
     padding: 6px 10px;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.05);
     border-radius: var(--radius-sm);
     font-size: 12px;
     color: var(--text-secondary);

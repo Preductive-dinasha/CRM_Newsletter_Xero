@@ -1,9 +1,11 @@
-# n8n Chat Agent Interface
+# Preddi - Chat Agent Interface
 
 ## Overview
-A reusable Flask-based chat interface that connects to n8n workflows as the AI engine. Designed to be portable and embeddable into other Python and HTML/JS applications.
+A reusable Flask-based chat interface ("Preddi") that connects to n8n workflows as the AI engine. Designed to be portable and embeddable into other Python and HTML/JS applications.
 
 ## Recent Changes
+- 2026-02-10: Rebranded to "Preddi", switched to light theme (#F9F9F9 bg, #308AD8 accent, #0A222C text)
+- 2026-02-10: Improved n8n response parser to handle more response formats (nested, wrapped, double-encoded)
 - 2026-02-10: Initial build - Flask app with chat UI, n8n integration, file/image upload, voice-to-text
 
 ## Architecture
@@ -15,7 +17,7 @@ A reusable Flask-based chat interface that connects to n8n workflows as the AI e
 ```
 app.py                  # Flask application - main entry point
 templates/index.html    # Chat interface HTML
-static/css/style.css    # Chat UI styling (dark theme)
+static/css/style.css    # Chat UI styling (light theme - Preddi brand)
 static/js/chat.js       # Chat client logic (messages, files, voice)
 uploads/                # Temporary file storage (auto-cleaned)
 ```
@@ -59,7 +61,8 @@ python app.py
 Runs on port 5000.
 
 ## User Preferences
+- AI agent name: "Preddi"
+- Light theme: background #F9F9F9, accent/icons #308AD8, text #0A222C
 - Python Flask backend preferred
 - Vanilla JS frontend (no React/framework)
-- Dark theme UI
 - Must be portable to other HTML/JS and Python apps

@@ -412,8 +412,8 @@ btnNewSession.addEventListener("click", async () => {
                     <path d="M15 13v2"/><path d="M9 13v2"/>
                 </svg>
             </div>
-            <h2>Welcome!</h2>
-            <p>Start a conversation with your n8n agent. You can send text, paste images, attach documents, or use the microphone.</p>
+            <h2>Hi, I'm Preddi</h2>
+            <p>Start a conversation with me. You can send text, paste images, attach documents, or use the microphone.</p>
         </div>
     `;
     setStatus("Ready", "ready");
