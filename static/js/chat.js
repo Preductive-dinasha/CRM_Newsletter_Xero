@@ -57,12 +57,18 @@ function setupSpeechRecognition() {
 
     recognition.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
-        stopRecording();
+        if (event.error === "not-allowed" || event.error === "service-not-available") {
+            stopRecording();
+        }
     };
 
     recognition.onend = () => {
         if (isRecording) {
-            stopRecording();
+            try {
+                recognition.start();
+            } catch (e) {
+                stopRecording();
+            }
         }
     };
 }
