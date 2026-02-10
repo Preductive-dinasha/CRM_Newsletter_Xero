@@ -170,7 +170,7 @@ def chat():
     }
 
     if N8N_BEARER_TOKEN:
-        headers["Authorization"] = f"Bearer {N8N_BEARER_TOKEN}"
+        headers["X-API-Key"] = N8N_BEARER_TOKEN
 
     try:
         response = requests.post(

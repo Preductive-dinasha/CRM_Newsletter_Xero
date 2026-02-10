@@ -43,7 +43,7 @@ run = ["gunicorn", "--bind=0.0.0.0:5000", "--reuse-port", "app:app"]
 [userenv.shared]
 
 [userenv.development]
-AI_INTEGRATIONS_OPENAI_BASE_URL = "s"
+AI_INTEGRATIONS_OPENAI_BASE_URL = "https://automation.preductive.co/webhook-test/450070c6-477c-44d5-a891-934975d1c01b"
 AI_INTEGRATIONS_OPENAI_API_KEY = "s"
 
 [userenv.production]

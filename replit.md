@@ -29,9 +29,9 @@ uploads/                # Temporary file storage (auto-cleaned)
 - Image display from agent outputs
 - Drag-and-drop file attachments
 
-## Secrets Required
+## Environment Variables Required
 - `N8N_WEBHOOK_URL` - The n8n webhook URL for the agent
-- `N8N_BEARER_TOKEN` - Bearer token for n8n webhook authentication
+- `N8N_BEARER_TOKEN` - API key for n8n webhook Header Auth (sent as X-API-Key header)
 - `SESSION_SECRET` - Flask session secret (already set)
 
 ## API Endpoints
