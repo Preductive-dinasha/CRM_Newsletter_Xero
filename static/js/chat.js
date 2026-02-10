@@ -55,10 +55,18 @@ function setupSpeechRecognition() {
         }
     };
 
+    let networkErrorCount = 0;
+
     recognition.onerror = (event) => {
         console.error("Speech recognition error:", event.error);
         if (event.error === "not-allowed" || event.error === "service-not-available") {
             stopRecording();
+        } else if (event.error === "network") {
+            networkErrorCount++;
+            if (networkErrorCount >= 2) {
+                stopRecording();
+                alert("Voice input isn't available in this view. Please open the app in a new browser tab to use the microphone.");
+            }
         }
     };
 
@@ -66,6 +74,7 @@ function setupSpeechRecognition() {
         if (isRecording) {
             try {
                 recognition.start();
+                networkErrorCount = 0;
             } catch (e) {
                 stopRecording();
             }
