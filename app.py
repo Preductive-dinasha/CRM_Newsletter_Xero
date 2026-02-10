@@ -2,11 +2,15 @@ import os
 import uuid
 import base64
 import json
+import logging
 import requests
 import markdown
 import bleach
 from flask import Flask, render_template, request, jsonify, session
 from werkzeug.utils import secure_filename
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
@@ -40,70 +44,127 @@ def file_to_base64(file_path):
         return base64.b64encode(f.read()).decode("utf-8")
 
 
+def extract_text_from_dict(d):
+    for key in ["output", "text", "message", "response", "answer", "content", "result"]:
+        if key in d:
+            val = d[key]
+            if isinstance(val, str):
+                return val
+            elif isinstance(val, dict):
+                nested = extract_text_from_dict(val)
+                if nested:
+                    return nested
+    if "json" in d and isinstance(d["json"], dict):
+        nested = extract_text_from_dict(d["json"])
+        if nested:
+            return nested
+    if "data" in d and isinstance(d["data"], dict):
+        nested = extract_text_from_dict(d["data"])
+        if nested:
+            return nested
+    return None
+
+
+def extract_media_from_dict(d):
+    media = []
+    for key in ["image", "images", "media", "files", "attachments"]:
+        if key in d:
+            val = d[key]
+            if isinstance(val, str):
+                media.append({"type": "image", "url": val})
+            elif isinstance(val, list):
+                for item in val:
+                    if isinstance(item, str):
+                        media.append({"type": "image", "url": item})
+                    elif isinstance(item, dict):
+                        media.append({
+                            "type": item.get("type", "image"),
+                            "url": item.get("url", item.get("src", "")),
+                            "name": item.get("name", ""),
+                        })
+    return media
+
+
+ALLOWED_TAGS = [
+    "p", "br", "strong", "em", "b", "i", "u", "s", "del",
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "ul", "ol", "li", "blockquote",
+    "pre", "code", "a", "img",
+    "table", "thead", "tbody", "tr", "th", "td",
+    "hr", "div", "span", "sub", "sup",
+]
+ALLOWED_ATTRS = {
+    "a": ["href", "title", "target"],
+    "img": ["src", "alt", "title", "width", "height"],
+    "code": ["class"],
+    "td": ["align"],
+    "th": ["align"],
+}
+
+
+def render_markdown_safe(text):
+    raw_html = markdown.markdown(str(text), extensions=["fenced_code", "tables", "nl2br"])
+    return bleach.clean(raw_html, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS)
+
+
 def parse_n8n_response(response_data):
     if isinstance(response_data, str):
         try:
             response_data = json.loads(response_data)
         except json.JSONDecodeError:
-            return {"text": response_data, "media": []}
+            return {"text": render_markdown_safe(response_data), "raw_text": response_data, "media": []}
 
     text = ""
     media = []
 
-    if isinstance(response_data, dict):
-        text = response_data.get("output", response_data.get("text", response_data.get("message", response_data.get("response", ""))))
-
-        if not text and len(response_data) == 1:
-            text = str(list(response_data.values())[0])
-
-        for key in ["image", "images", "media", "files", "attachments"]:
-            if key in response_data:
-                val = response_data[key]
-                if isinstance(val, str):
-                    media.append({"type": "image", "url": val})
-                elif isinstance(val, list):
-                    for item in val:
-                        if isinstance(item, str):
-                            media.append({"type": "image", "url": item})
-                        elif isinstance(item, dict):
-                            media.append({
-                                "type": item.get("type", "image"),
-                                "url": item.get("url", item.get("src", "")),
-                                "name": item.get("name", ""),
-                            })
-
-    elif isinstance(response_data, list):
+    if isinstance(response_data, list):
         if len(response_data) > 0:
             first = response_data[0]
             if isinstance(first, dict):
                 return parse_n8n_response(first)
+            elif isinstance(first, str):
+                try:
+                    parsed = json.loads(first)
+                    return parse_n8n_response(parsed)
+                except (json.JSONDecodeError, TypeError):
+                    text = str(first)
             else:
                 text = str(first)
+        text = text or "No response received"
+        return {"text": render_markdown_safe(text), "raw_text": text, "media": []}
+
+    if isinstance(response_data, dict):
+        text = extract_text_from_dict(response_data)
+        media = extract_media_from_dict(response_data)
+
+        if not text:
+            if len(response_data) == 1:
+                val = list(response_data.values())[0]
+                if isinstance(val, str):
+                    text = val
+                elif isinstance(val, dict):
+                    text = extract_text_from_dict(val) or json.dumps(val, indent=2)
+                else:
+                    text = str(val)
+            else:
+                text = json.dumps(response_data, indent=2)
 
     if isinstance(text, dict):
         text = json.dumps(text, indent=2)
 
-    raw_html = markdown.markdown(str(text), extensions=["fenced_code", "tables", "nl2br"])
+    if isinstance(text, str):
+        try:
+            inner = json.loads(text)
+            if isinstance(inner, dict):
+                extracted = extract_text_from_dict(inner)
+                if extracted:
+                    text = extracted
+        except (json.JSONDecodeError, TypeError):
+            pass
 
-    allowed_tags = [
-        "p", "br", "strong", "em", "b", "i", "u", "s", "del",
-        "h1", "h2", "h3", "h4", "h5", "h6",
-        "ul", "ol", "li", "blockquote",
-        "pre", "code", "a", "img",
-        "table", "thead", "tbody", "tr", "th", "td",
-        "hr", "div", "span", "sub", "sup",
-    ]
-    allowed_attrs = {
-        "a": ["href", "title", "target"],
-        "img": ["src", "alt", "title", "width", "height"],
-        "code": ["class"],
-        "td": ["align"],
-        "th": ["align"],
-    }
+    text = str(text) if text else "No response received"
 
-    html_text = bleach.clean(raw_html, tags=allowed_tags, attributes=allowed_attrs)
-
-    return {"text": html_text, "raw_text": str(text), "media": media}
+    return {"text": render_markdown_safe(text), "raw_text": text, "media": media}
 
 
 @app.route("/")
@@ -185,12 +246,19 @@ def chat():
         )
         response.raise_for_status()
 
+        logger.debug(f"n8n raw response status: {response.status_code}")
+        logger.debug(f"n8n raw response text: {response.text[:500]}")
+
         try:
             response_data = response.json()
         except json.JSONDecodeError:
             response_data = response.text
 
+        logger.debug(f"n8n parsed response_data type: {type(response_data).__name__}")
+        logger.debug(f"n8n parsed response_data: {str(response_data)[:500]}")
+
         parsed = parse_n8n_response(response_data)
+        logger.debug(f"Final parsed result: {str(parsed)[:500]}")
 
         return jsonify({
             "success": True,
