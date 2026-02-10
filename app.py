@@ -18,8 +18,11 @@ MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
 
-N8N_WEBHOOK_URL = os.environ.get("N8N_WEBHOOK_URL", "")
-N8N_BEARER_TOKEN = os.environ.get("N8N_BEARER_TOKEN", "")
+def get_n8n_config():
+    return {
+        "url": os.environ.get("N8N_WEBHOOK_URL", ""),
+        "token": os.environ.get("N8N_BEARER_TOKEN", ""),
+    }
 
 
 def allowed_file(filename):
@@ -122,8 +125,9 @@ def reset_session():
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
-    if not N8N_WEBHOOK_URL:
-        return jsonify({"error": "n8n webhook URL not configured. Set N8N_WEBHOOK_URL in secrets."}), 500
+    n8n = get_n8n_config()
+    if not n8n["url"]:
+        return jsonify({"error": "n8n webhook URL not configured. Set N8N_WEBHOOK_URL in environment config."}), 500
 
     session_id = get_session_id()
 
@@ -169,12 +173,12 @@ def chat():
         "Content-Type": "application/json",
     }
 
-    if N8N_BEARER_TOKEN:
-        headers["X-API-Key"] = N8N_BEARER_TOKEN
+    if n8n["token"]:
+        headers["X-API-Key"] = n8n["token"]
 
     try:
         response = requests.post(
-            N8N_WEBHOOK_URL,
+            n8n["url"],
             json=payload,
             headers=headers,
             timeout=120,
@@ -208,7 +212,7 @@ def chat():
 def health():
     return jsonify({
         "status": "ok",
-        "n8n_configured": bool(N8N_WEBHOOK_URL),
+        "n8n_configured": bool(get_n8n_config()["url"]),
         "session_id": get_session_id(),
     })
 
