@@ -3,10 +3,12 @@ import uuid
 import base64
 import json
 import logging
+import re
+from urllib.parse import urlparse, quote
 import requests
 import markdown
 import bleach
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, Response
 from werkzeug.utils import secure_filename
 
 logging.basicConfig(level=logging.DEBUG)
@@ -65,6 +67,38 @@ def extract_text_from_dict(d):
     return None
 
 
+def get_n8n_base_url():
+    webhook_url = os.environ.get("N8N_WEBHOOK_URL", "")
+    if webhook_url:
+        parsed = urlparse(webhook_url)
+        return f"{parsed.scheme}://{parsed.netloc}"
+    return ""
+
+
+def is_n8n_image_path(s):
+    if not isinstance(s, str) or len(s) > 500:
+        return False
+    if not s.startswith("/webhook"):
+        return False
+    if ".." in s or "//" in s:
+        return False
+    return bool(re.match(r'^/webhook/[a-zA-Z0-9/_-]+$', s))
+
+
+def resolve_media_url(val, mime=None):
+    if not val or not isinstance(val, str):
+        return ""
+    if val.startswith("data:"):
+        return val
+    if val.startswith("http"):
+        return val
+    if is_n8n_image_path(val):
+        return f"/api/n8n-image?path={quote(val, safe='/')}"
+    if len(val) > 200:
+        return make_data_uri(val, mime)
+    return val
+
+
 def make_data_uri(data_str, mime=None):
     if data_str.startswith("data:"):
         return data_str
@@ -80,24 +114,25 @@ def extract_media_from_dict(d):
             continue
         val = d[key]
         if isinstance(val, str):
-            url = make_data_uri(val) if not val.startswith("http") and len(val) > 200 else val
-            media.append({"type": "image", "url": url})
+            url = resolve_media_url(val)
+            if url:
+                media.append({"type": "image", "url": url})
         elif isinstance(val, list):
             for item in val:
                 if isinstance(item, str):
-                    url = make_data_uri(item) if not item.startswith("http") and len(item) > 200 else item
-                    media.append({"type": "image", "url": url})
+                    url = resolve_media_url(item)
+                    if url:
+                        media.append({"type": "image", "url": url})
                 elif isinstance(item, dict):
-                    url = item.get("url", item.get("src", item.get("data", "")))
-                    if "data" in item and not url.startswith("http"):
-                        url = make_data_uri(item["data"], item.get("mime", item.get("mimeType", item.get("content_type"))))
-                    elif url and not url.startswith("http") and not url.startswith("data:") and len(url) > 200:
-                        url = make_data_uri(url, item.get("mime", item.get("mimeType", item.get("content_type"))))
-                    media.append({
-                        "type": item.get("type", "image"),
-                        "url": url,
-                        "name": item.get("name", ""),
-                    })
+                    raw = item.get("data", item.get("url", item.get("src", "")))
+                    mime = item.get("mime", item.get("mimeType", item.get("content_type")))
+                    url = resolve_media_url(raw, mime)
+                    if url:
+                        media.append({
+                            "type": item.get("type", "image"),
+                            "url": url,
+                            "name": item.get("name", ""),
+                        })
     return media
 
 
@@ -175,6 +210,9 @@ def parse_n8n_response(response_data):
                 extracted = extract_text_from_dict(inner)
                 if extracted:
                     text = extracted
+                inner_media = extract_media_from_dict(inner)
+                if inner_media:
+                    media = inner_media
         except (json.JSONDecodeError, TypeError):
             pass
 
@@ -290,6 +328,45 @@ def chat():
         return jsonify({"error": f"n8n returned an error: {e.response.status_code}"}), e.response.status_code
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {str(e)}"}), 500
+
+
+@app.route("/api/n8n-image", methods=["GET"])
+def proxy_n8n_image():
+    image_path = request.args.get("path", "")
+    if not is_n8n_image_path(image_path):
+        return jsonify({"error": "Invalid image path"}), 400
+
+    n8n = get_n8n_config()
+    base_url = get_n8n_base_url()
+    if not base_url:
+        return jsonify({"error": "n8n not configured"}), 500
+
+    full_url = f"{base_url}{image_path}"
+    headers = {}
+    if n8n["token"]:
+        headers["X-API-Key"] = n8n["token"]
+
+    try:
+        resp = requests.get(full_url, headers=headers, timeout=30, stream=True)
+        resp.raise_for_status()
+
+        content_type = resp.headers.get("Content-Type", "application/octet-stream")
+        if not content_type.startswith("image/"):
+            logger.warning(f"n8n image proxy got non-image content-type: {content_type}")
+            return jsonify({"error": "Not an image"}), 400
+
+        max_size = 20 * 1024 * 1024
+        if len(resp.content) > max_size:
+            return jsonify({"error": "Image too large"}), 413
+
+        return Response(
+            resp.content,
+            content_type=content_type,
+            headers={"Cache-Control": "private, max-age=3600"},
+        )
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to fetch n8n image: {e}")
+        return jsonify({"error": "Failed to fetch image"}), 502
 
 
 @app.route("/api/health", methods=["GET"])

@@ -41,6 +41,7 @@ uploads/                # Temporary file storage (auto-cleaned)
 - `GET /api/session` - Get current session ID
 - `POST /api/session/reset` - Start new conversation
 - `POST /api/chat` - Send message (supports multipart form with files)
+- `GET /api/n8n-image?path=<path>` - Proxy to fetch images from n8n server (authenticated)
 - `GET /api/health` - Health check
 
 ## n8n Payload Format
@@ -77,7 +78,14 @@ Images from n8n can be sent in several ways:
 {"image": "https://example.com/photo.png"}
 ```
 
+5. **Relative n8n webhook paths** (auto-proxied through Flask with auth):
+```json
+{"output": "Here's the image:", "media": [{"type": "image", "data": "/webhook/image/uuid", "mime": "image/png"}]}
+```
+
 Supported keys: `image`, `images`, `media`, `files`, `attachments`
+
+Note: Double-encoded JSON responses (where `output` contains a JSON string with nested `output` and `media`) are automatically unwrapped and parsed correctly.
 
 ## Running
 ```bash
