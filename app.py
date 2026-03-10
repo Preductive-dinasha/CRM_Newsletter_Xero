@@ -65,23 +65,39 @@ def extract_text_from_dict(d):
     return None
 
 
+def make_data_uri(data_str, mime=None):
+    if data_str.startswith("data:"):
+        return data_str
+    if mime:
+        return f"data:{mime};base64,{data_str}"
+    return f"data:image/png;base64,{data_str}"
+
+
 def extract_media_from_dict(d):
     media = []
     for key in ["image", "images", "media", "files", "attachments"]:
-        if key in d:
-            val = d[key]
-            if isinstance(val, str):
-                media.append({"type": "image", "url": val})
-            elif isinstance(val, list):
-                for item in val:
-                    if isinstance(item, str):
-                        media.append({"type": "image", "url": item})
-                    elif isinstance(item, dict):
-                        media.append({
-                            "type": item.get("type", "image"),
-                            "url": item.get("url", item.get("src", "")),
-                            "name": item.get("name", ""),
-                        })
+        if key not in d:
+            continue
+        val = d[key]
+        if isinstance(val, str):
+            url = make_data_uri(val) if not val.startswith("http") and len(val) > 200 else val
+            media.append({"type": "image", "url": url})
+        elif isinstance(val, list):
+            for item in val:
+                if isinstance(item, str):
+                    url = make_data_uri(item) if not item.startswith("http") and len(item) > 200 else item
+                    media.append({"type": "image", "url": url})
+                elif isinstance(item, dict):
+                    url = item.get("url", item.get("src", item.get("data", "")))
+                    if "data" in item and not url.startswith("http"):
+                        url = make_data_uri(item["data"], item.get("mime", item.get("mimeType", item.get("content_type"))))
+                    elif url and not url.startswith("http") and not url.startswith("data:") and len(url) > 200:
+                        url = make_data_uri(url, item.get("mime", item.get("mimeType", item.get("content_type"))))
+                    media.append({
+                        "type": item.get("type", "image"),
+                        "url": url,
+                        "name": item.get("name", ""),
+                    })
     return media
 
 

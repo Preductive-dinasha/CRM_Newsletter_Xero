@@ -54,6 +54,31 @@ Messages are sent as JSON to the n8n webhook:
 }
 ```
 
+## n8n Image Response Formats
+Images from n8n can be sent in several ways:
+
+1. **Base64 data URI** (recommended for security - no public URL needed):
+```json
+{"output": "Here's your image!", "image": "data:image/png;base64,iVBORw0KGgo..."}
+```
+
+2. **Raw base64 string** (auto-detected if >200 chars and not a URL):
+```json
+{"output": "Result:", "image": "iVBORw0KGgo..."}
+```
+
+3. **Media objects with base64 data**:
+```json
+{"media": [{"type": "image", "data": "base64...", "mime": "image/png", "name": "chart.png"}]}
+```
+
+4. **Public URLs** (still supported):
+```json
+{"image": "https://example.com/photo.png"}
+```
+
+Supported keys: `image`, `images`, `media`, `files`, `attachments`
+
 ## Running
 ```bash
 python app.py

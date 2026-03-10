@@ -273,12 +273,13 @@ function addMessage(role, content, media = [], attachments = []) {
         const mediaDiv = document.createElement("div");
         mediaDiv.className = "message-media";
         media.forEach(m => {
-            if (m.type === "image" && m.url) {
+            if (m.type === "image" && (m.url || m.data)) {
+                const src = m.url || (m.data.startsWith("data:") ? m.data : `data:${m.mime || "image/png"};base64,${m.data}`);
                 const img = document.createElement("img");
-                img.src = m.url;
+                img.src = src;
                 img.alt = m.name || "Image";
                 img.loading = "lazy";
-                img.onclick = () => showImageModal(m.url);
+                img.onclick = () => showImageModal(src);
                 img.onerror = () => {
                     img.style.display = "none";
                 };
