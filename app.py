@@ -99,6 +99,13 @@ def make_data_uri(data_str, mime=None):
 
 def extract_media_from_dict(d):
     media = []
+    if "imageId" in d and isinstance(d["imageId"], str) and d["imageId"]:
+        media.append({
+            "type": "image",
+            "url": f"/api/n8n-image?imageId={quote(d['imageId'])}",
+            "name": d.get("name", d["imageId"]),
+        })
+        return media
     for key in ["image", "images", "media", "files", "attachments"]:
         if key not in d:
             continue

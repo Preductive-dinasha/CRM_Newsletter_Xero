@@ -275,15 +275,32 @@ function addMessage(role, content, media = [], attachments = []) {
         media.forEach(m => {
             if (m.type === "image" && (m.url || m.data)) {
                 const src = m.url || (m.data.startsWith("data:") ? m.data : `data:${m.mime || "image/png"};base64,${m.data}`);
+
+                const wrapper = document.createElement("div");
+                wrapper.className = "media-image-wrapper loading";
+
+                const spinner = document.createElement("div");
+                spinner.className = "media-spinner";
+
                 const img = document.createElement("img");
-                img.src = src;
                 img.alt = m.name || "Image";
                 img.loading = "lazy";
-                img.onclick = () => showImageModal(src);
-                img.onerror = () => {
-                    img.style.display = "none";
+
+                img.onload = () => {
+                    wrapper.classList.remove("loading");
+                    wrapper.classList.remove("error");
+                    img.onclick = () => showImageModal(src);
                 };
-                mediaDiv.appendChild(img);
+                img.onerror = () => {
+                    wrapper.classList.remove("loading");
+                    wrapper.classList.add("error");
+                    wrapper.innerHTML = `<div class="media-error"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 9 6 6"/><path d="m15 9-6 6"/></svg><span>Image unavailable</span></div>`;
+                };
+
+                img.src = src;
+                wrapper.appendChild(spinner);
+                wrapper.appendChild(img);
+                mediaDiv.appendChild(wrapper);
             }
         });
         contentDiv.appendChild(mediaDiv);
