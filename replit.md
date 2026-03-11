@@ -78,12 +78,14 @@ Images from n8n can be sent in several ways:
 {"image": "https://example.com/photo.png"}
 ```
 
-5. **Relative n8n webhook paths** (auto-proxied through Flask with auth):
+5. **Media objects with imageId** (auto-proxied through Flask with auth):
 ```json
-{"output": "Here's the image:", "media": [{"type": "image", "data": "/webhook/image/uuid", "mime": "image/png"}]}
+{"output": "Here's the image:", "media": [{"type": "image", "imageId": "mlmih378at64w61a.png", "mime": "image/png", "name": "car_auckland.png"}]}
 ```
 
 Supported keys: `image`, `images`, `media`, `files`, `attachments`
+
+For the `imageId` format, Preddi will POST to `/webhook/getimage` on your n8n server with `{"imageId": "..."}` in the request body.
 
 Note: Double-encoded JSON responses (where `output` contains a JSON string with nested `output` and `media`) are automatically unwrapped and parsed correctly.
 

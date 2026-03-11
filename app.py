@@ -75,25 +75,15 @@ def get_n8n_base_url():
     return ""
 
 
-def is_n8n_image_path(s):
-    if not isinstance(s, str) or len(s) > 500:
-        return False
-    if not s.startswith("/webhook"):
-        return False
-    if ".." in s or "//" in s:
-        return False
-    return bool(re.match(r'^/webhook/[a-zA-Z0-9/_-]+$', s))
-
-
-def resolve_media_url(val, mime=None):
+def resolve_media_url(val, mime=None, image_id=None):
+    if image_id:
+        return f"/api/n8n-image?imageId={quote(image_id)}"
     if not val or not isinstance(val, str):
         return ""
     if val.startswith("data:"):
         return val
     if val.startswith("http"):
         return val
-    if is_n8n_image_path(val):
-        return f"/api/n8n-image?path={quote(val, safe='/')}"
     if len(val) > 200:
         return make_data_uri(val, mime)
     return val
@@ -124,9 +114,10 @@ def extract_media_from_dict(d):
                     if url:
                         media.append({"type": "image", "url": url})
                 elif isinstance(item, dict):
+                    image_id = item.get("imageId")
                     raw = item.get("data", item.get("url", item.get("src", "")))
                     mime = item.get("mime", item.get("mimeType", item.get("content_type")))
-                    url = resolve_media_url(raw, mime)
+                    url = resolve_media_url(raw, mime, image_id=image_id)
                     if url:
                         media.append({
                             "type": item.get("type", "image"),
@@ -332,22 +323,27 @@ def chat():
 
 @app.route("/api/n8n-image", methods=["GET"])
 def proxy_n8n_image():
-    image_path = request.args.get("path", "")
-    if not is_n8n_image_path(image_path):
-        return jsonify({"error": "Invalid image path"}), 400
+    image_id = request.args.get("imageId", "")
+    if not image_id or len(image_id) > 200:
+        return jsonify({"error": "Invalid image ID"}), 400
 
     n8n = get_n8n_config()
     base_url = get_n8n_base_url()
-    if not base_url:
+    if not base_url or not n8n["url"]:
         return jsonify({"error": "n8n not configured"}), 500
 
-    full_url = f"{base_url}{image_path}"
-    headers = {}
+    headers = {"Content-Type": "application/json"}
     if n8n["token"]:
         headers["X-API-Key"] = n8n["token"]
 
     try:
-        resp = requests.get(full_url, headers=headers, timeout=30, stream=True)
+        resp = requests.post(
+            f"{base_url}/webhook/getimage",
+            json={"imageId": image_id},
+            headers=headers,
+            timeout=30,
+            stream=True,
+        )
         resp.raise_for_status()
 
         content_type = resp.headers.get("Content-Type", "application/octet-stream")
