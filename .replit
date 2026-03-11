@@ -41,6 +41,7 @@ run = ["gunicorn", "--bind=0.0.0.0:5000", "--reuse-port", "app:app"]
 [userenv]
 
 [userenv.shared]
+PREDDI_SKILLS = "Xero,Newsletter,CRM"
 
 [userenv.development]
 AI_INTEGRATIONS_OPENAI_BASE_URL = "https://automation.preductive.co/webhook-test/450070c6-477c-44d5-a891-934975d1c01b"

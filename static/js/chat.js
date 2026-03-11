@@ -9,18 +9,143 @@ const filePreview = document.getElementById("file-preview");
 const filePreviewItems = document.getElementById("file-preview-items");
 const statusDot = document.querySelector(".status-dot");
 const statusText = document.getElementById("status-text");
+const skillDropdown = document.getElementById("skill-dropdown");
+const skillChipContainer = document.getElementById("skill-chip-container");
 
 let pendingFiles = [];
 let isProcessing = false;
 let recognition = null;
 let isRecording = false;
+let availableSkills = [];
+let selectedSkill = null;
+let skillDropdownIndex = -1;
 
 function init() {
     fetch("/api/session").then(r => r.json());
+    loadSkills();
     setupSpeechRecognition();
     setupPasteHandler();
     setupDragDrop();
     autoResizeTextarea();
+}
+
+async function loadSkills() {
+    try {
+        const resp = await fetch("/api/skills");
+        const data = await resp.json();
+        availableSkills = data.skills || [];
+    } catch (e) {
+        availableSkills = [];
+    }
+}
+
+function showSkillDropdown(filter) {
+    if (availableSkills.length === 0) {
+        hideSkillDropdown();
+        return;
+    }
+
+    const query = (filter || "").toLowerCase();
+    const filtered = query
+        ? availableSkills.filter(s => s.toLowerCase().includes(query))
+        : availableSkills;
+
+    if (filtered.length === 0) {
+        hideSkillDropdown();
+        return;
+    }
+
+    skillDropdownIndex = -1;
+    skillDropdown.innerHTML = "";
+
+    filtered.forEach((skill, i) => {
+        const item = document.createElement("div");
+        item.className = "skill-dropdown-item";
+        item.textContent = skill;
+        item.addEventListener("mousedown", (e) => {
+            e.preventDefault();
+            selectSkill(skill);
+        });
+        skillDropdown.appendChild(item);
+    });
+
+    skillDropdown.classList.remove("hidden");
+}
+
+function hideSkillDropdown() {
+    skillDropdown.classList.add("hidden");
+    skillDropdownIndex = -1;
+}
+
+function navigateSkillDropdown(direction) {
+    const items = skillDropdown.querySelectorAll(".skill-dropdown-item");
+    if (items.length === 0) return;
+
+    items.forEach(item => item.classList.remove("active"));
+
+    if (direction === "down") {
+        skillDropdownIndex = (skillDropdownIndex + 1) % items.length;
+    } else {
+        skillDropdownIndex = skillDropdownIndex <= 0 ? items.length - 1 : skillDropdownIndex - 1;
+    }
+
+    items[skillDropdownIndex].classList.add("active");
+    items[skillDropdownIndex].scrollIntoView({ block: "nearest" });
+}
+
+function selectSkillFromDropdown() {
+    const items = skillDropdown.querySelectorAll(".skill-dropdown-item");
+    if (skillDropdownIndex >= 0 && skillDropdownIndex < items.length) {
+        selectSkill(items[skillDropdownIndex].textContent);
+    } else if (items.length > 0) {
+        selectSkill(items[0].textContent);
+    }
+}
+
+function selectSkill(skill) {
+    selectedSkill = skill;
+    renderSkillChip();
+    hideSkillDropdown();
+
+    const val = messageInput.value;
+    const atIdx = val.lastIndexOf("@");
+    if (atIdx >= 0) {
+        messageInput.value = val.substring(0, atIdx);
+    }
+    messageInput.focus();
+    autoResizeTextarea();
+}
+
+function clearSkill() {
+    selectedSkill = null;
+    renderSkillChip();
+}
+
+function renderSkillChip() {
+    if (!selectedSkill) {
+        skillChipContainer.classList.add("hidden");
+        skillChipContainer.innerHTML = "";
+        return;
+    }
+
+    skillChipContainer.classList.remove("hidden");
+    skillChipContainer.innerHTML = "";
+
+    const chip = document.createElement("div");
+    chip.className = "skill-chip";
+
+    const label = document.createElement("span");
+    label.className = "skill-chip-label";
+    label.textContent = selectedSkill;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.className = "skill-chip-remove";
+    removeBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>`;
+    removeBtn.addEventListener("click", clearSkill);
+
+    chip.appendChild(label);
+    chip.appendChild(removeBtn);
+    skillChipContainer.appendChild(chip);
 }
 
 function setupSpeechRecognition() {
@@ -219,7 +344,7 @@ function setStatus(text, state) {
     if (state === "error") statusDot.classList.add("error");
 }
 
-function addMessage(role, content, media = [], attachments = []) {
+function addMessage(role, content, media = [], attachments = [], skill = null) {
     const welcome = chatMessages.querySelector(".welcome-message");
     if (welcome) welcome.remove();
 
@@ -262,7 +387,14 @@ function addMessage(role, content, media = [], attachments = []) {
     bubble.className = "message-bubble";
 
     if (role === "user") {
-        bubble.textContent = content;
+        if (skill) {
+            const skillBadge = document.createElement("span");
+            skillBadge.className = "skill-badge";
+            skillBadge.textContent = skill;
+            bubble.appendChild(skillBadge);
+        }
+        const textNode = document.createTextNode(content);
+        bubble.appendChild(textNode);
     } else {
         bubble.innerHTML = content;
     }
@@ -370,14 +502,21 @@ async function sendMessage() {
         preview: f.type.startsWith("image/") ? URL.createObjectURL(f) : null,
     }));
 
-    addMessage("user", message || "Sent attachments", [], userAttachments);
+    const currentSkill = selectedSkill;
+
+    addMessage("user", message || "Sent attachments", [], userAttachments, currentSkill);
 
     const formData = new FormData();
     formData.append("message", message);
     pendingFiles.forEach(f => formData.append("files", f));
+    if (currentSkill) {
+        formData.append("skill", currentSkill);
+    }
 
     messageInput.value = "";
     pendingFiles = [];
+    selectedSkill = null;
+    renderSkillChip();
     renderFilePreview();
     autoResizeTextarea();
 
@@ -411,9 +550,52 @@ async function sendMessage() {
     btnSend.disabled = false;
 }
 
-messageInput.addEventListener("input", autoResizeTextarea);
+messageInput.addEventListener("input", (e) => {
+    autoResizeTextarea();
+
+    const val = messageInput.value;
+    const atIdx = val.lastIndexOf("@");
+
+    if (atIdx >= 0 && availableSkills.length > 0) {
+        const afterAt = val.substring(atIdx + 1);
+        if (!/\s/.test(afterAt) || afterAt === "") {
+            showSkillDropdown(afterAt);
+            return;
+        }
+    }
+
+    hideSkillDropdown();
+});
 
 messageInput.addEventListener("keydown", (e) => {
+    if (!skillDropdown.classList.contains("hidden")) {
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            navigateSkillDropdown("down");
+            return;
+        }
+        if (e.key === "ArrowUp") {
+            e.preventDefault();
+            navigateSkillDropdown("up");
+            return;
+        }
+        if (e.key === "Enter" || e.key === "Tab") {
+            e.preventDefault();
+            selectSkillFromDropdown();
+            return;
+        }
+        if (e.key === "Escape") {
+            e.preventDefault();
+            hideSkillDropdown();
+            const val = messageInput.value;
+            const atIdx = val.lastIndexOf("@");
+            if (atIdx >= 0) {
+                messageInput.value = val.substring(0, atIdx);
+            }
+            return;
+        }
+    }
+
     if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         sendMessage();
@@ -449,7 +631,15 @@ btnNewSession.addEventListener("click", async () => {
             <p>Start a conversation with me. You can send text, paste images, attach documents, or use the microphone.</p>
         </div>
     `;
+    selectedSkill = null;
+    renderSkillChip();
     setStatus("Ready", "ready");
+});
+
+document.addEventListener("click", (e) => {
+    if (!skillDropdown.contains(e.target) && e.target !== messageInput) {
+        hideSkillDropdown();
+    }
 });
 
 init();

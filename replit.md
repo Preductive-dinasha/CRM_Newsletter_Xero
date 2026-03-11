@@ -4,6 +4,7 @@
 A reusable Flask-based chat interface ("Preddi") that connects to n8n workflows as the AI engine. Designed to be portable and embeddable into other Python and HTML/JS applications.
 
 ## Recent Changes
+- 2026-03-11: Added skill selector — type `@` in chat to pick a skill; sent as `skill` field in n8n payload; PREDDI_SKILLS env var config
 - 2026-02-10: Rebranded to "Preddi", switched to light theme (#F9F9F9 bg, #308AD8 accent, #0A222C text)
 - 2026-02-10: Improved n8n response parser to handle more response formats (nested, wrapped, double-encoded)
 - 2026-02-10: Initial build - Flask app with chat UI, n8n integration, file/image upload, voice-to-text
@@ -30,18 +31,21 @@ uploads/                # Temporary file storage (auto-cleaned)
 - Markdown rendering for agent responses
 - Image display from agent outputs
 - Drag-and-drop file attachments
+- Skill selector: type `@` in chat input to pick a skill (e.g. Xero, Newsletter, CRM) — sent as `skill` field to n8n
 
 ## Environment Variables Required
 - `N8N_WEBHOOK_URL` - The n8n webhook URL for the agent
 - `N8N_BEARER_TOKEN` - API key for n8n webhook Header Auth (sent as X-API-Key header)
 - `SESSION_SECRET` - Flask session secret (already set)
+- `PREDDI_SKILLS` - Comma-separated list of skill names for the skill selector (e.g. `Xero,Newsletter,CRM`)
 
 ## API Endpoints
 - `GET /` - Chat interface
 - `GET /api/session` - Get current session ID
 - `POST /api/session/reset` - Start new conversation
 - `POST /api/chat` - Send message (supports multipart form with files)
-- `GET /api/n8n-image?path=<path>` - Proxy to fetch images from n8n server (authenticated)
+- `GET /api/n8n-image?imageId=<id>` - Proxy to fetch images from n8n server (authenticated)
+- `GET /api/skills` - Get available skills list (from PREDDI_SKILLS env var)
 - `GET /api/health` - Health check
 
 ## n8n Payload Format

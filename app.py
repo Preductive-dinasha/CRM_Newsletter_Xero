@@ -281,11 +281,16 @@ def chat():
             except OSError:
                 pass
 
+    skill = request.form.get("skill", "").strip()
+
     payload = {
         "sessionId": session_id,
         "message": message,
         "chatInput": message,
     }
+
+    if skill:
+        payload["skill"] = skill
 
     if attachments:
         payload["attachments"] = attachments
@@ -378,6 +383,13 @@ def proxy_n8n_image():
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to fetch n8n image: {e}")
         return jsonify({"error": "Failed to fetch image"}), 502
+
+
+@app.route("/api/skills", methods=["GET"])
+def get_skills():
+    raw = os.environ.get("PREDDI_SKILLS", "")
+    skills = [s.strip() for s in raw.split(",") if s.strip()] if raw else []
+    return jsonify({"skills": skills})
 
 
 @app.route("/api/health", methods=["GET"])
