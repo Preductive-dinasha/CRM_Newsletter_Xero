@@ -77,6 +77,14 @@ def get_n8n_base_url():
 
 def resolve_media_url(val, mime=None, image_id=None):
     if image_id:
+        if "." not in image_id:
+            ext_map = {
+                "image/png": "png", "image/jpeg": "jpg", "image/jpg": "jpg",
+                "image/gif": "gif", "image/webp": "webp", "image/bmp": "bmp",
+            }
+            ext = ext_map.get(mime or "", "")
+            if ext:
+                image_id = f"{image_id}.{ext}"
         return f"/api/n8n-image?imageId={quote(image_id)}"
     if not val or not isinstance(val, str):
         return ""
