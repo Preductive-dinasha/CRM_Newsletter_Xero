@@ -385,10 +385,13 @@ def proxy_n8n_image():
         return jsonify({"error": "Failed to fetch image"}), 502
 
 
+DEFAULT_SKILLS = ["Xero", "Newsletter", "CRM"]
+
+
 @app.route("/api/skills", methods=["GET"])
 def get_skills():
     raw = os.environ.get("PREDDI_SKILLS", "")
-    skills = [s.strip() for s in raw.split(",") if s.strip()] if raw else []
+    skills = [s.strip() for s in raw.split(",") if s.strip()] if raw else DEFAULT_SKILLS
     return jsonify({"skills": skills})
 
 
