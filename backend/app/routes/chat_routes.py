@@ -49,7 +49,11 @@ def send_message(session_id: int):
 @chat_bp.route("/chat/<int:session_id>/history", methods=["GET"])
 @jwt_required()
 def get_history(session_id: int):
-    history = _chat_service.get_history(session_id)
+    user_id = int(get_jwt_identity())
+    try:
+        history = _chat_service.get_history_for_user(session_id, user_id)
+    except ChatError as e:
+        return jsonify({"error": str(e)}), 403
     return jsonify({"history": [h.to_dict() for h in history]}), 200
 
 

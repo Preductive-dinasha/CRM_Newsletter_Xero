@@ -38,6 +38,12 @@ class ChatService:
     def get_history(self, session_id: int) -> List[ChatHistory]:
         return self.chat_repo.find_by_session_id(session_id)
 
+    def get_history_for_user(self, session_id: int, user_id: int) -> List[ChatHistory]:
+        session = self.session_repo.find_by_id(session_id)
+        if not session or session.user_id != user_id:
+            raise ChatError("Session not found or access denied.")
+        return self.chat_repo.find_by_session_id(session_id)
+
     def _history_as_list(self, session_id: int) -> list:
         history = self.chat_repo.find_by_session_id(session_id)
         return [{"role": h.role, "content": h.content} for h in history]
