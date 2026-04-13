@@ -36,6 +36,23 @@ def create_app(config_class=None) -> Flask:
     app.register_blueprint(session_bp)
     app.register_blueprint(user_bp)
 
+    frontend_dist = os.path.join(os.path.dirname(__file__), "..", "..", "frontend", "dist")
+    frontend_dist = os.path.abspath(frontend_dist)
+
+    if os.path.isdir(frontend_dist):
+        from flask import send_from_directory
+
+        @app.route("/", defaults={"path": ""})
+        @app.route("/<path:path>")
+        def serve_spa(path):
+            if path and path.startswith("api"):
+                from flask import abort
+                abort(404)
+            full = os.path.join(frontend_dist, path)
+            if path and os.path.isfile(full):
+                return send_from_directory(frontend_dist, path)
+            return send_from_directory(frontend_dist, "index.html")
+
     @app.route("/api/health")
     def health():
         from flask import jsonify
