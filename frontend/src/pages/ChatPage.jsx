@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Sidebar from "../components/Sidebar";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
@@ -7,23 +7,31 @@ import { sendMessage } from "../api/chat";
 import { createSession } from "../api/sessions";
 
 const AGENT_LS_KEY = "preddi_last_agent";
-const SKILL_COLORS = {
-  CRM: "#f59e0b",
-  Newsletter: "#3b82f6",
-  Xero: "#22c55e",
+
+const AGENT_COLORS = {
+  CRM: { dot: "bg-amber-500", badge: "bg-amber-500/10 text-amber-600 border border-amber-500/25" },
+  Newsletter: { dot: "bg-blue-500", badge: "bg-blue-500/10 text-blue-600 border border-blue-500/25" },
+  Xero: { dot: "bg-green-500", badge: "bg-green-500/10 text-green-600 border border-green-500/25" },
 };
 
 function AgentBadge({ agent }) {
   if (!agent || agent === "General") return null;
-  const color = SKILL_COLORS[agent] || "#308AD8";
+  const c = AGENT_COLORS[agent] || { dot: "bg-[#308AD8]", badge: "bg-[#308AD8]/10 text-[#308AD8] border border-[#308AD8]/25" };
   return (
-    <span
-      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
-      style={{ background: `${color}18`, color, border: `1px solid ${color}44` }}
-    >
-      <span className="w-1.5 h-1.5 rounded-full" style={{ background: color }} />
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${c.badge}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} />
       @{agent}
     </span>
+  );
+}
+
+function HamburgerIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
   );
 }
 
@@ -94,10 +102,16 @@ export default function ChatPage() {
       }
     }
 
+    let filePreview = null;
+    if (file && file.type.startsWith("image/")) {
+      filePreview = URL.createObjectURL(file);
+    }
+
     const userMsg = {
       role: "user",
       content: message,
       skill: effectiveSkill || null,
+      file_preview: filePreview,
       created_at: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, userMsg]);
@@ -132,15 +146,13 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, errMsg]);
     } finally {
       setIsTyping(false);
+      if (filePreview) URL.revokeObjectURL(filePreview);
     }
   }, [activeSessionId, agent]);
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "#F9F9F9" }}>
-      <div
-        className={`transition-all duration-300 flex-shrink-0 ${sidebarOpen ? "" : "hidden"}`}
-        style={{ width: sidebarOpen ? 260 : 0 }}
-      >
+    <div className="flex h-screen overflow-hidden bg-[#F9F9F9]">
+      <div className={`flex-shrink-0 transition-all duration-300 ${sidebarOpen ? "w-64" : "w-0 overflow-hidden"}`}>
         {sidebarOpen && (
           <Sidebar
             activeSessionId={activeSessionId}
@@ -153,24 +165,16 @@ export default function ChatPage() {
       </div>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header
-          className="flex-shrink-0 flex items-center gap-3 px-4 py-3 border-b"
-          style={{ background: "white", borderColor: "#e5e7eb" }}
-        >
+        <header className="flex-shrink-0 flex items-center gap-3 px-4 py-3 border-b border-gray-200 bg-white">
           <button
             onClick={() => setSidebarOpen((v) => !v)}
-            className="p-2 rounded-lg transition-all flex-shrink-0"
-            style={{ color: "#9ca3af" }}
+            className="p-2 rounded-lg transition-all text-gray-400 hover:bg-gray-100 hover:text-[#0A222C] flex-shrink-0"
             title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "#f3f4f6"; e.currentTarget.style.color = "#0A222C"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#9ca3af"; }}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
+            <HamburgerIcon />
           </button>
 
-          <h1 className="font-semibold text-base truncate flex-1" style={{ color: "#0A222C" }}>
+          <h1 className="font-semibold text-base truncate flex-1 text-[#0A222C]">
             {sessionTitle}
           </h1>
 

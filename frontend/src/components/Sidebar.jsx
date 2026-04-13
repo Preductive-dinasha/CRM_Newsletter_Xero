@@ -2,8 +2,45 @@ import { useState, useEffect } from "react";
 import { getSessions, createSession, deleteSession } from "../api/sessions";
 import { useAuth } from "../context/AuthContext";
 
+function TrashIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14H6L5 6" />
+      <path d="M10 11v6M14 11v6" />
+      <path d="M9 6V4h6v2" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+function PlusIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19" />
+      <line x1="5" y1="12" x2="19" y2="12" />
+    </svg>
+  );
+}
+
+function SignOutIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  );
+}
+
 function SessionItem({ session, active, onSelect, onDelete }) {
-  const [hovering, setHovering] = useState(false);
   const [confirming, setConfirming] = useState(false);
 
   const handleDelete = (e) => {
@@ -19,34 +56,22 @@ function SessionItem({ session, active, onSelect, onDelete }) {
 
   return (
     <div
-      className="group relative flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all text-sm"
-      style={{
-        background: active ? "rgba(255,255,255,0.12)" : hovering ? "rgba(255,255,255,0.06)" : "transparent",
-        color: active ? "#fff" : "rgba(255,255,255,0.75)",
-      }}
+      className={`group relative flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all text-sm ${
+        active ? "bg-white/12 text-white" : "text-white/75 hover:bg-white/6"
+      }`}
       onClick={() => onSelect(session.session_id)}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => { setHovering(false); setConfirming(false); }}
+      onMouseLeave={() => setConfirming(false)}
     >
       <span className="flex-1 truncate">{session.title || "New Chat"}</span>
-      {(hovering || active) && (
-        <button
-          onClick={handleDelete}
-          className="flex-shrink-0 p-0.5 rounded transition-all opacity-0 group-hover:opacity-100"
-          style={{ color: confirming ? "#f87171" : "rgba(255,255,255,0.5)" }}
-          title={confirming ? "Click again to delete" : "Delete"}
-        >
-          {confirming ? (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          ) : (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4h6v2" />
-            </svg>
-          )}
-        </button>
-      )}
+      <button
+        onClick={handleDelete}
+        className={`flex-shrink-0 p-0.5 rounded transition-all opacity-0 group-hover:opacity-100 ${
+          confirming ? "text-red-400" : "text-white/50 hover:text-white"
+        }`}
+        title={confirming ? "Click again to delete" : "Delete"}
+      >
+        {confirming ? <CheckIcon /> : <TrashIcon />}
+      </button>
     </div>
   );
 }
@@ -90,13 +115,10 @@ export default function Sidebar({ activeSessionId, onSessionSelect, onNewSession
   const displayName = user ? `${user.f_name || ""} ${user.l_name || ""}`.trim() || user.email : "";
 
   return (
-    <aside
-      className="flex flex-col h-full w-full"
-      style={{ background: "#0A1929", borderRight: "1px solid rgba(255,255,255,0.08)" }}
-    >
+    <aside className="flex flex-col h-full w-full bg-[#0A1929] border-r border-white/8">
       <div className="p-4 flex-shrink-0">
         <div className="flex items-center gap-2 mb-4 px-1">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "#308AD8" }}>
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#308AD8]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
@@ -107,31 +129,20 @@ export default function Sidebar({ activeSessionId, onSessionSelect, onNewSession
         <button
           onClick={handleNew}
           disabled={creating}
-          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all"
-          style={{
-            background: "rgba(48,138,216,0.15)",
-            color: "#308AD8",
-            border: "1px solid rgba(48,138,216,0.25)",
-          }}
+          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all text-[#308AD8] bg-[#308AD8]/15 border border-[#308AD8]/25 hover:bg-[#308AD8]/25 disabled:opacity-60"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
+          <PlusIcon />
           {creating ? "Creating…" : "New Chat"}
         </button>
       </div>
 
       <div className="px-4 pb-2 flex-shrink-0">
-        <p className="text-xs font-medium px-1 mb-1" style={{ color: "rgba(255,255,255,0.3)" }}>
-          Recent
-        </p>
+        <p className="text-xs font-medium px-1 mb-1 text-white/30">Recent</p>
       </div>
 
       <div className="flex-1 overflow-y-auto px-2 scrollbar-thin">
         {sessions.length === 0 ? (
-          <p className="text-xs text-center py-4" style={{ color: "rgba(255,255,255,0.3)" }}>
-            No conversations yet
-          </p>
+          <p className="text-xs text-center py-4 text-white/30">No conversations yet</p>
         ) : (
           sessions.map((s) => (
             <SessionItem
@@ -145,34 +156,21 @@ export default function Sidebar({ activeSessionId, onSessionSelect, onNewSession
         )}
       </div>
 
-      <div
-        className="p-4 flex-shrink-0"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
-      >
+      <div className="p-4 flex-shrink-0 border-t border-white/8">
         <div className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
-            style={{ background: "#308AD8" }}
-          >
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 bg-[#308AD8]">
             {initials}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate text-white">{displayName}</p>
-            <p className="text-xs truncate" style={{ color: "rgba(255,255,255,0.4)" }}>{user?.email}</p>
+            <p className="text-xs truncate text-white/40">{user?.email}</p>
           </div>
           <button
             onClick={logout}
             title="Sign out"
-            className="p-1.5 rounded-lg transition-all"
-            style={{ color: "rgba(255,255,255,0.4)" }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = "#fff"; e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.4)"; e.currentTarget.style.background = "transparent"; }}
+            className="p-1.5 rounded-lg transition-all text-white/40 hover:text-white hover:bg-white/8"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
+            <SignOutIcon />
           </button>
         </div>
       </div>

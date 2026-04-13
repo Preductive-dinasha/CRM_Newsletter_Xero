@@ -4,6 +4,7 @@
 Preddi is a full-stack AI chat interface built with React + Vite + TailwindCSS (frontend) and Flask Clean Architecture (backend). It connects to n8n webhooks for specialist agents (@CRM, @Newsletter, @Xero) and OpenAI for general queries.
 
 ## Recent Changes
+- 2026-04-13: Task #3 fixes — auto-redirect after signup (no success screen), full Tailwind-only refactor (removed all inline style={} and <style> tags), file attachment inline preview in chat bubbles (file_preview blob URL on user messages), sidebar mobile hamburger toggle
 - 2026-04-13: Task #3 complete — SignupPage with real-time password strength, mic button (Web Speech API), agent selector dropdown with localStorage persistence, image thumbnail preview in input, inline file images in bubbles, error state styling, agent badge in header, sidebar mobile toggle
 - 2026-04-13: Full rebuild — React+Vite+Tailwind frontend, Flask Clean Architecture backend, PostgreSQL, JWT httpOnly cookies
 - 2026-03-11: Added skill selector — type `@` in chat to pick a skill; sent as `skill` field in n8n payload
