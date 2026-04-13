@@ -1,0 +1,342 @@
+Build a full-stack AI chatbot application with the following exact specifications. 
+Complete the entire project — frontend, backend, database schema, tests — before stopping.
+
+═══════════════════════════════════════════════════════
+STACK
+═══════════════════════════════════════════════════════
+Frontend : React (Vite), TailwindCSS
+Backend  : Python 3.11, Flask, Flask-JWT-Extended, SQLAlchemy
+Database : PostgreSQL (use DATABASE_URL env var)
+Testing  : pytest + pytest-flask for backend, Vitest for frontend
+
+─────────────────────────────────────────────
+CODING STANDARDS — NON-NEGOTIABLE
+─────────────────────────────────────────────
+- Clean Architecture: routes → services → repositories → models
+- DRY, KISS, YAGNI, Single Responsibility Principle
+- No business logic in route handlers
+- All secrets via environment variables only
+- Every service must have a corresponding unit test file
+- Use dependency injection where practical
+- Type hints on every Python function
+
+═══════════════════════════════════════════════════════
+PROJECT STRUCTURE
+═══════════════════════════════════════════════════════
+
+/
+├── backend/
+│   ├── app/
+│   │   ├── __init__.py              # Flask app factory
+│   │   ├── config.py                # Config from env vars
+│   │   ├── extensions.py            # db, jwt, migrate singletons
+│   │   ├── models/
+│   │   │   ├── user.py
+│   │   │   ├── session.py
+│   │   │   └── chat_history.py
+│   │   ├── repositories/
+│   │   │   ├── user_repository.py
+│   │   │   ├── session_repository.py
+│   │   │   └── chat_repository.py
+│   │   ├── services/
+│   │   │   ├── auth_service.py
+│   │   │   ├── chat_service.py
+│   │   │   ├── session_service.py
+│   │   │   ├── n8n_service.py
+│   │   │   ├── summarisation_service.py
+│   │   │   └── file_service.py
+│   │   └── routes/
+│   │       ├── auth_routes.py
+│   │       ├── chat_routes.py
+│   │       ├── session_routes.py
+│   │       └── user_routes.py
+│   ├── tests/
+│   │   ├── conftest.py
+│   │   ├── test_auth_service.py
+│   │   ├── test_chat_service.py
+│   │   ├── test_session_service.py
+│   │   ├── test_n8n_service.py
+│   │   └── test_summarisation_service.py
+│   ├── migrations/
+│   ├── requirements.txt
+│   └── run.py
+└── frontend/
+    ├── src/
+    │   ├── main.jsx
+    │   ├── App.jsx
+    │   ├── api/                     # All axios calls here
+    │   │   ├── authApi.js
+    │   │   ├── chatApi.js
+    │   │   └── sessionApi.js
+    │   ├── components/
+    │   │   ├── layout/
+    │   │   │   ├── Sidebar.jsx      # Session list + new chat
+    │   │   │   └── AppShell.jsx
+    │   │   ├── chat/
+    │   │   │   ├── ChatWindow.jsx
+    │   │   │   ├── MessageBubble.jsx
+    │   │   │   ├── InputBar.jsx     # Text, file, mic
+    │   │   │   └── AgentSelector.jsx
+    │   │   └── auth/
+    │   │       ├── LoginPage.jsx
+    │   │       └── SignupPage.jsx
+    │   ├── hooks/
+    │   │   ├── useChat.js
+    │   │   ├── useSession.js
+    │   │   └── useSpeech.js         # Web Speech API
+    │   ├── context/
+    │   │   └── AuthContext.jsx
+    │   └── utils/
+    │       └── fileHelpers.js
+    ├── index.html
+    ├── vite.config.js
+    └── package.json
+
+═══════════════════════════════════════════════════════
+DATABASE SCHEMA — implement exactly
+═══════════════════════════════════════════════════════
+
+Table: users
+  user_id    SERIAL PRIMARY KEY
+  email      VARCHAR(255) UNIQUE NOT NULL
+  password   VARCHAR(255) NOT NULL          -- bcrypt hashed
+  f_name     VARCHAR(100) NOT NULL
+  l_name     VARCHAR(100) NOT NULL
+  company    VARCHAR(255)
+  created_at TIMESTAMPTZ DEFAULT NOW()
+
+Table: sessions
+  session_id SERIAL PRIMARY KEY
+  user_id    INTEGER REFERENCES users(user_id) ON DELETE CASCADE
+  title      VARCHAR(255) DEFAULT 'New Chat'
+  created_at TIMESTAMPTZ DEFAULT NOW()
+
+Table: chat_history
+  id         SERIAL PRIMARY KEY
+  session_id INTEGER REFERENCES sessions(session_id) ON DELETE CASCADE
+  role       VARCHAR(10) NOT NULL CHECK (role IN ('user','agent'))
+  content    TEXT NOT NULL
+  media_url  TEXT                             -- for images/files from n8n
+  created_at TIMESTAMPTZ DEFAULT NOW()
+
+History fetch:
+  SELECT * FROM chat_history WHERE session_id = ? ORDER BY created_at ASC
+
+═══════════════════════════════════════════════════════
+AUTHENTICATION
+═══════════════════════════════════════════════════════
+- JWT (access + refresh tokens), stored in httpOnly cookies
+- Password rules: min 8 chars, ≥1 uppercase, ≥1 lowercase, ≥1 digit, ≥1 special char
+- Enforce password rules both frontend (real-time) and backend
+- Seed ONE initial user on first run (skip if already exists):
+    email    : dinasha@preductive.co
+    password : Admin@1234  ← change on first login prompt
+    f_name   : Dinasha
+    l_name   : Admin
+    company  : Preductive
+- Protected routes require valid JWT
+
+═══════════════════════════════════════════════════════
+AGENT ROUTING — CORE LOGIC
+═══════════════════════════════════════════════════════
+The chat input has an agent selector. Options:
+  @CRM        → POST to N8N_CRM_WEBHOOK_URL
+  @NewsLetter → POST to N8N_NEWSLETTER_WEBHOOK_URL
+  @Xero       → POST to N8N_XERO_WEBHOOK_URL
+  General     → Use Claude / OpenAI API directly (no n8n)
+
+When an agent is selected, ONLY that agent is active for the session until changed.
+The selector is prominently displayed and clearly shows which agent is active.
+
+Payload sent TO n8n (JSON):
+{
+  "user_id"    : <int>,
+  "session_id" : <int>,
+  "message"    : "<string>",
+  "history"    : [{"role": "user"|"agent", "content": "..."}],
+  "file_url"   : "<string|null>"       // if file/image attached
+}
+
+Response FROM n8n (JSON):
+{
+  "user_id"    : <int>,
+  "session_id" : <int>,
+  "message"    : "<string>",           // original user message
+  "reply"      : "<string>",           // agent reply to display
+  "media_url"  : "<string|null>"       // optional image/file URL to render
+}
+
+After every exchange, append 2 rows to chat_history:
+  {role: 'user',  content: message,     session_id}
+  {role: 'agent', content: reply,       session_id, media_url}
+
+═══════════════════════════════════════════════════════
+HISTORY MANAGEMENT
+═══════════════════════════════════════════════════════
+- n8n has NO memory. Feed it the FULL history every call.
+- Summarisation: if history exceeds 30 turns, compress the oldest 20 turns
+  into a single summary message via a second LLM call, replace those rows
+  with one {role:'agent', content:'[Summary] ...'} row. 
+  Implement in summarisation_service.py.
+- History is fetched fresh from DB before EVERY message send.
+
+═══════════════════════════════════════════════════════
+SESSION TITLES
+═══════════════════════════════════════════════════════
+- On the FIRST user message of a new session, call the LLM to generate
+  a concise title (≤6 words) from that first message.
+- Update sessions.title with the result.
+- Sidebar updates reactively without full reload.
+
+═══════════════════════════════════════════════════════
+FILE & IMAGE SUPPORT
+═══════════════════════════════════════════════════════
+- Input bar accepts: paste from clipboard, drag-and-drop, file picker button
+- Accepted types: images (png, jpg, gif, webp), PDF, docx, txt
+- On attachment, show a thumbnail/preview in the input area
+- Upload file to backend /api/upload → store in /uploads folder → return URL
+- Pass file_url in the n8n payload
+- In message bubbles: render images inline, show file links for documents
+- If n8n response includes media_url pointing to an image, render it inline
+
+═══════════════════════════════════════════════════════
+MICROPHONE / SPEECH TO TEXT
+═══════════════════════════════════════════════════════
+- Mic button in InputBar using Web Speech API (SpeechRecognition)
+- Continuous: false. Language: en-US (default, user can override later)
+- Transcription populates the text input field
+- Show visual indicator (pulsing ring) while recording
+- Graceful fallback if browser doesn't support it
+
+═══════════════════════════════════════════════════════
+FRONTEND UI REQUIREMENTS
+═══════════════════════════════════════════════════════
+
+Layout (logged-in app shell):
+  ┌──────────────────────────────────────────────┐
+  │  Left Sidebar (260px fixed)                  │
+  │  ┌──────────┐  Logo + app name               │
+  │  │ + New    │  Button                        │
+  │  │──────────│                                │
+  │  │ Session  │  Auto-named, click to open     │
+  │  │ list     │  Most recent first             │
+  │  │          │  Delete session option         │
+  │  └──────────┘                                │
+  │  Right: Chat area (flex-1)                   │
+  │  ┌─ Agent badge top-centre (e.g. @CRM) ────┐ │
+  │  │ Message thread (scrollable)             │ │
+  │  │                                         │ │
+  │  └─ InputBar ──────────────────────────────┘ │
+  │     [📎][🎤] [Agent select ▼] [Text…] [Send] │
+  └──────────────────────────────────────────────┘
+
+Styling rules:
+  • Dark sidebar, light chat area (think Claude.ai / ChatGPT aesthetic)
+  • User messages: right-aligned bubble, accent colour
+  • Agent messages: left-aligned, white bubble with avatar icon
+  • Loading: animated typing dots while awaiting n8n/LLM response
+  • Fully responsive (mobile sidebar collapses to hamburger)
+  • Smooth transitions between sessions
+
+Login page:
+  • Centred card, email + password, "Forgot password" placeholder
+  • Link to Sign Up page
+  
+Sign Up page:
+  • First name, Last name, Email, Password, Confirm Password, Company (optional)
+  • Real-time password strength indicator
+  • On success → redirect to login
+
+═══════════════════════════════════════════════════════
+ENVIRONMENT VARIABLES (create .env.example)
+═══════════════════════════════════════════════════════
+DATABASE_URL=postgresql://user:pass@host:5432/dbname
+JWT_SECRET_KEY=<long-random-string>
+OPENAI_API_KEY=<key>                   # for General chat + summarisation + titles
+N8N_CRM_WEBHOOK_URL=https://...
+N8N_NEWSLETTER_WEBHOOK_URL=https://...
+N8N_XERO_WEBHOOK_URL=https://...
+UPLOAD_FOLDER=./uploads
+MAX_CONTENT_LENGTH=16777216            # 16MB
+
+═══════════════════════════════════════════════════════
+BACKEND API ROUTES
+═══════════════════════════════════════════════════════
+POST   /api/auth/register
+POST   /api/auth/login
+POST   /api/auth/logout
+POST   /api/auth/refresh
+GET    /api/auth/me
+
+GET    /api/sessions                   # all sessions for current user
+POST   /api/sessions                   # create new session
+PATCH  /api/sessions/<id>/title        # update title
+DELETE /api/sessions/<id>
+
+POST   /api/chat/send                  # main chat endpoint
+GET    /api/chat/history/<session_id>  # fetch full history
+
+POST   /api/upload                     # file upload
+
+GET    /api/users/me
+PATCH  /api/users/me
+
+═══════════════════════════════════════════════════════
+UNIT TESTS — required coverage
+═══════════════════════════════════════════════════════
+test_auth_service.py:
+  - test_password_validation_passes
+  - test_password_validation_fails_short
+  - test_password_validation_fails_no_special
+  - test_register_creates_user
+  - test_login_wrong_password_raises
+
+test_chat_service.py:
+  - test_routes_to_crm_agent
+  - test_routes_to_general_when_no_agent
+  - test_history_appended_correctly
+  - test_history_fetched_before_send
+
+test_session_service.py:
+  - test_create_session
+  - test_title_auto_generated
+  - test_get_user_sessions
+
+test_n8n_service.py:
+  - test_payload_structure_correct
+  - test_file_url_included_when_present
+  - test_handles_n8n_timeout
+
+test_summarisation_service.py:
+  - test_summarise_triggered_above_threshold
+  - test_summarise_not_triggered_below_threshold
+  - test_summary_replaces_old_turns
+
+═══════════════════════════════════════════════════════
+STARTUP SEQUENCE
+═══════════════════════════════════════════════════════
+1. Create PostgreSQL tables via SQLAlchemy + Flask-Migrate
+2. Seed initial user (dinasha@preductive.co) if not exists
+3. Start Flask on port 5000
+4. Vite dev server on port 5173 (proxy /api → localhost:5000)
+5. Print clear startup message with URLs
+
+Add a README.md with:
+  - Setup instructions
+  - Environment variable reference
+  - How to run tests (pytest / vitest)
+  - n8n payload/response contract
+
+═══════════════════════════════════════════════════════
+CONSTRAINTS
+═══════════════════════════════════════════════════════
+- Do NOT use localStorage for auth tokens — use httpOnly cookies
+- localStorage is only acceptable for: last-selected agent preference
+- All API calls must handle loading, error, and success states
+- No inline styles — use Tailwind classes only
+- Do not leave TODO comments — implement everything now
+- If an n8n webhook URL is not set, show a clear "Webhook not configured" 
+  message in that agent's chat rather than crashing
+
+Build the complete application now. Start with backend models and 
+migrations, then services, then routes, then tests, then frontend.
