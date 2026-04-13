@@ -110,7 +110,7 @@ export default function MessageList({ messages, isTyping }) {
               </svg>
             </div>
             <h3 className="font-semibold text-lg text-[#0A222C]">How can I help you?</h3>
-            <p className="text-sm mt-1 text-gray-400">Type a message, use @ to pick a skill, or select an agent below</p>
+            <p className="text-sm mt-1 text-gray-400">Select an agent below, then type your message</p>
           </div>
         )}
 

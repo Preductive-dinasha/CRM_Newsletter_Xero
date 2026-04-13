@@ -1,9 +1,10 @@
 # Preddi - AI Chat Agent Interface
 
 ## Overview
-Preddi is a full-stack AI chat interface built with React + Vite + TailwindCSS (frontend) and Flask Clean Architecture (backend). It connects to n8n webhooks for specialist agents (@CRM, @Newsletter, @Xero) and OpenAI for general queries.
+Preddi is a full-stack AI chat interface built with React + Vite + TailwindCSS (frontend) and Flask Clean Architecture (backend). It routes all messages through n8n webhooks to specialist agents (@CRM, @Newsletter, @Xero).
 
 ## Recent Changes
+- 2026-04-13: Removed inbuilt AI (OpenAI/General) agent — all messages now route to n8n webhooks only; backend raises ChatError if no valid agent selected; title generation uses first-6-words; summarisation uses word-based compression; agent dropdown always shows @CRM/@Newsletter/@Xero
 - 2026-04-13: Task #3 fixes — auto-redirect after signup (no success screen), full Tailwind-only refactor (removed all inline style={} and <style> tags), file attachment inline preview in chat bubbles (file_preview blob URL on user messages), sidebar mobile hamburger toggle
 - 2026-04-13: Task #3 complete — SignupPage with real-time password strength, mic button (Web Speech API), agent selector dropdown with localStorage persistence, image thumbnail preview in input, inline file images in bubbles, error state styling, agent badge in header, sidebar mobile toggle
 - 2026-04-13: Full rebuild — React+Vite+Tailwind frontend, Flask Clean Architecture backend, PostgreSQL, JWT httpOnly cookies
@@ -102,10 +103,7 @@ frontend/
 - `SESSION_SECRET` - Flask session secret (required in production)
 - `JWT_SECRET_KEY` - JWT signing secret (required in production)
 - `N8N_BEARER_TOKEN` - n8n webhook auth token
-- `N8N_WEBHOOK_URL` - Base n8n webhook URL (legacy)
 - `N8N_CRM_WEBHOOK_URL`, `N8N_NEWSLETTER_WEBHOOK_URL`, `N8N_XERO_WEBHOOK_URL` - Per-agent webhooks
-- `AI_INTEGRATIONS_OPENAI_API_KEY` - OpenAI API key (via Replit integration)
-- `AI_INTEGRATIONS_OPENAI_BASE_URL` - OpenAI base URL (via Replit integration)
 - `PREDDI_SKILLS` - Comma-separated skill names (default: CRM,Newsletter,Xero)
 
 ## Seed User

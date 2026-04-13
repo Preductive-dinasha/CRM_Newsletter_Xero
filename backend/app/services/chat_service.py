@@ -1,7 +1,5 @@
 import logging
 from typing import Optional, List
-from flask import current_app
-from openai import OpenAI
 from ..models.chat_history import ChatHistory
 from ..repositories.chat_repository import ChatRepository
 from ..repositories.session_repository import SessionRepository
@@ -30,11 +28,6 @@ class ChatService:
         self.n8n_service = n8n_service or N8nService()
         self.summarisation_service = summarisation_service or SummarisationService(self.chat_repo)
 
-    def _get_openai_client(self) -> OpenAI:
-        base_url = current_app.config.get("OPENAI_BASE_URL") or None
-        api_key = current_app.config.get("OPENAI_API_KEY") or "no-key"
-        return OpenAI(api_key=api_key, base_url=base_url or None)
-
     def get_history(self, session_id: int) -> List[ChatHistory]:
         return self.chat_repo.find_by_session_id(session_id)
 
@@ -49,59 +42,8 @@ class ChatService:
         return [{"role": h.role, "content": h.content} for h in history]
 
     def _generate_title(self, first_message: str) -> str:
-        client = self._get_openai_client()
-        model = current_app.config.get("OPENAI_MODEL", "gpt-4o-mini")
-        try:
-            response = client.chat.completions.create(
-                model=model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": (
-                            "Generate a concise chat session title (maximum 6 words, no quotes, no punctuation at end) "
-                            "that captures the topic of this user message."
-                        ),
-                    },
-                    {"role": "user", "content": first_message},
-                ],
-                max_tokens=20,
-                temperature=0.5,
-            )
-            raw = response.choices[0].message.content.strip()
-            words = raw.split()[:6]
-            return " ".join(words)[:255]
-        except Exception as e:
-            logger.error(f"Title generation error: {e}")
-            return " ".join(first_message.split()[:6])[:50]
-
-    def _call_general_openai(self, message: str, history: list) -> dict:
-        client = self._get_openai_client()
-        model = current_app.config.get("OPENAI_MODEL", "gpt-4o-mini")
-        messages = [
-            {
-                "role": "system",
-                "content": "You are Preddi, a helpful AI assistant for Preductive. Answer clearly and concisely.",
-            }
-        ]
-        for h in history:
-            role = "assistant" if h["role"] == "agent" else "user"
-            messages.append({"role": role, "content": h["content"]})
-        messages.append({"role": "user", "content": message})
-
-        try:
-            response = client.chat.completions.create(
-                model=model,
-                messages=messages,
-                max_tokens=1024,
-                temperature=0.7,
-            )
-            return {
-                "reply": response.choices[0].message.content.strip(),
-                "media_url": None,
-            }
-        except Exception as e:
-            logger.error(f"OpenAI general chat error: {e}")
-            raise ChatError(f"AI service error: {e}")
+        words = first_message.strip().split()[:6]
+        return " ".join(words)[:255] or "New Chat"
 
     def send_message(
         self,
@@ -117,25 +59,27 @@ class ChatService:
 
         is_first = self.chat_repo.count_by_session_id(session_id) == 0
 
-        history = self._history_as_list(session_id)
-
         agent_lower = (agent or "").lower().strip().lstrip("@")
 
-        if agent_lower and agent_lower in N8N_AGENTS:
-            from .n8n_service import N8nError as _N8nError
-            try:
-                result = self.n8n_service.send_to_agent(
-                    agent=agent_lower,
-                    user_id=user_id,
-                    session_id=session_id,
-                    message=message,
-                    history=history,
-                    file_url=file_url,
-                )
-            except _N8nError as e:
-                raise ChatError(str(e))
-        else:
-            result = self._call_general_openai(message, history)
+        if not agent_lower or agent_lower not in N8N_AGENTS:
+            raise ChatError(
+                "Please select an agent to continue — choose @CRM, @Newsletter, or @Xero."
+            )
+
+        history = self._history_as_list(session_id)
+
+        from .n8n_service import N8nError as _N8nError
+        try:
+            result = self.n8n_service.send_to_agent(
+                agent=agent_lower,
+                user_id=user_id,
+                session_id=session_id,
+                message=message,
+                history=history,
+                file_url=file_url,
+            )
+        except _N8nError as e:
+            raise ChatError(str(e))
 
         self.chat_repo.create(session_id=session_id, role="user", content=message)
         self.chat_repo.create(

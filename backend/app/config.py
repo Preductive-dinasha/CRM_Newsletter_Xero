@@ -39,10 +39,6 @@ class Config:
     JWT_REFRESH_TOKEN_EXPIRES: timedelta = timedelta(days=30)
     JWT_COOKIE_CSRF_PROTECT: bool = True
 
-    OPENAI_API_KEY: str = os.environ.get("AI_INTEGRATIONS_OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY", "")
-    OPENAI_BASE_URL: str = os.environ.get("AI_INTEGRATIONS_OPENAI_BASE_URL") or ""
-    OPENAI_MODEL: str = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
-
     N8N_CRM_WEBHOOK_URL: str = os.environ.get("N8N_CRM_WEBHOOK_URL", "")
     N8N_NEWSLETTER_WEBHOOK_URL: str = os.environ.get("N8N_NEWSLETTER_WEBHOOK_URL", "")
     N8N_XERO_WEBHOOK_URL: str = os.environ.get("N8N_XERO_WEBHOOK_URL", "")
@@ -60,5 +56,3 @@ class TestingConfig(Config):
     JWT_COOKIE_SECURE: bool = False
     JWT_COOKIE_CSRF_PROTECT: bool = False
     WTF_CSRF_ENABLED: bool = False
-    OPENAI_API_KEY: str = "test-key"
-    OPENAI_BASE_URL: str = ""

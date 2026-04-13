@@ -84,7 +84,7 @@ class TestAgentRouting:
             assert call_kwargs["agent"] == "crm"
             assert result["reply"] == "CRM reply"
 
-    def test_routes_to_general_when_no_agent(self, app):
+    def test_raises_error_when_no_agent(self, app):
         with app.app_context():
             mock_chat_repo = MagicMock()
             mock_session_repo = MagicMock()
@@ -93,8 +93,6 @@ class TestAgentRouting:
 
             mock_session_repo.find_by_id.return_value = make_mock_session()
             mock_chat_repo.count_by_session_id.return_value = 1
-            mock_chat_repo.find_by_session_id.return_value = make_mock_history(1)
-            mock_summarise.maybe_summarise.return_value = False
 
             service = ChatService(
                 chat_repo=mock_chat_repo,
@@ -103,14 +101,36 @@ class TestAgentRouting:
                 summarisation_service=mock_summarise,
             )
 
-            with patch.object(service, "_call_general_openai", return_value={"reply": "General reply", "media_url": None}):
-                with patch.object(service, "_generate_title", return_value="Test Title"):
-                    result = service.send_message(
-                        user_id=42, session_id=1, message="General question", agent=None
-                    )
+            with pytest.raises(ChatError, match="select an agent"):
+                service.send_message(
+                    user_id=42, session_id=1, message="Some question", agent=None
+                )
 
             mock_n8n.send_to_agent.assert_not_called()
-            assert result["reply"] == "General reply"
+
+    def test_raises_error_for_unknown_agent(self, app):
+        with app.app_context():
+            mock_chat_repo = MagicMock()
+            mock_session_repo = MagicMock()
+            mock_n8n = MagicMock()
+            mock_summarise = MagicMock()
+
+            mock_session_repo.find_by_id.return_value = make_mock_session()
+            mock_chat_repo.count_by_session_id.return_value = 1
+
+            service = ChatService(
+                chat_repo=mock_chat_repo,
+                session_repo=mock_session_repo,
+                n8n_service=mock_n8n,
+                summarisation_service=mock_summarise,
+            )
+
+            with pytest.raises(ChatError, match="select an agent"):
+                service.send_message(
+                    user_id=42, session_id=1, message="Some question", agent="General"
+                )
+
+            mock_n8n.send_to_agent.assert_not_called()
 
     def test_history_appended_correctly(self, app):
         with app.app_context():

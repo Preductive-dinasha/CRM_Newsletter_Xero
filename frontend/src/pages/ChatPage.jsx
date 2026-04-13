@@ -15,7 +15,7 @@ const AGENT_COLORS = {
 };
 
 function AgentBadge({ agent }) {
-  if (!agent || agent === "General") return null;
+  if (!agent) return null;
   const c = AGENT_COLORS[agent] || { dot: "bg-[#308AD8]", badge: "bg-[#308AD8]/10 text-[#308AD8] border border-[#308AD8]/25" };
   return (
     <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${c.badge}`}>
@@ -44,7 +44,10 @@ export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [skills, setSkills] = useState([]);
 
-  const savedAgent = typeof window !== "undefined" ? (localStorage.getItem(AGENT_LS_KEY) || "General") : "General";
+  const defaultAgent = "CRM";
+  const savedAgent = typeof window !== "undefined"
+    ? (localStorage.getItem(AGENT_LS_KEY) || defaultAgent)
+    : defaultAgent;
   const [agent, setAgent] = useState(savedAgent);
 
   const handleAgentChange = useCallback((a) => {
@@ -87,7 +90,7 @@ export default function ChatPage() {
   const handleSend = useCallback(async ({ message, skill, file }) => {
     if (!message.trim() && !file) return;
 
-    const effectiveSkill = skill || (agent !== "General" ? agent : null);
+    const effectiveSkill = skill || agent;
     let currentSessionId = activeSessionId;
 
     if (!currentSessionId) {

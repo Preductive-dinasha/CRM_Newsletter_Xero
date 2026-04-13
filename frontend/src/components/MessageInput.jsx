@@ -19,22 +19,18 @@ function AgentDropdown({ agent, onSelect, skills }) {
     };
   }, []);
 
-  const options = ["General", ...(skills || [])];
-  const isAgent = agent !== "General";
+  const options = skills && skills.length > 0 ? skills : ["CRM", "Newsletter", "Xero"];
+  const isAgent = true;
 
   return (
     <div ref={ref} className="relative flex-shrink-0">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
-          isAgent
-            ? "bg-[#308AD8]/10 text-[#308AD8] border border-[#308AD8]/25 hover:bg-[#308AD8]/20"
-            : "bg-gray-100 text-gray-500 border border-gray-200 hover:bg-gray-200"
-        }`}
+        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all bg-[#308AD8]/10 text-[#308AD8] border border-[#308AD8]/25 hover:bg-[#308AD8]/20"
         title="Select agent"
       >
-        {isAgent ? `@${agent}` : "General"}
+        @{agent}
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="6 9 12 15 18 9" />
         </svg>
@@ -52,15 +48,7 @@ function AgentDropdown({ agent, onSelect, skills }) {
                 }`}
                 onClick={() => { onSelect(opt); setOpen(false); }}
               >
-                {opt === "General" ? (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="2" y1="12" x2="22" y2="12" />
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                  </svg>
-                ) : (
-                  <span className="text-xs opacity-50">@</span>
-                )}
+                <span className="text-xs opacity-50">@</span>
                 {opt}
               </button>
             ))}
@@ -230,11 +218,6 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
             </div>
           )}
 
-          {!file && agent && agent !== "General" && (
-            <div className="flex items-center gap-2 px-4 pt-3">
-              <SkillChip skill={agent} onRemove={() => onAgentChange && onAgentChange("General")} />
-            </div>
-          )}
 
           <textarea
             ref={textareaRef}
