@@ -5,7 +5,7 @@ from openai import OpenAI
 from ..models.chat_history import ChatHistory
 from ..repositories.chat_repository import ChatRepository
 from ..repositories.session_repository import SessionRepository
-from .n8n_service import N8nService, WebhookNotConfiguredError
+from .n8n_service import N8nService
 from .summarisation_service import SummarisationService
 
 logger = logging.getLogger(__name__)
@@ -67,10 +67,12 @@ class ChatService:
                 max_tokens=20,
                 temperature=0.5,
             )
-            return response.choices[0].message.content.strip()[:255]
+            raw = response.choices[0].message.content.strip()
+            words = raw.split()[:6]
+            return " ".join(words)[:255]
         except Exception as e:
             logger.error(f"Title generation error: {e}")
-            return first_message[:50]
+            return " ".join(first_message.split()[:6])[:50]
 
     def _call_general_openai(self, message: str, history: list) -> dict:
         client = self._get_openai_client()
@@ -120,6 +122,7 @@ class ChatService:
         agent_lower = (agent or "").lower().strip().lstrip("@")
 
         if agent_lower and agent_lower in N8N_AGENTS:
+            from .n8n_service import N8nError as _N8nError
             try:
                 result = self.n8n_service.send_to_agent(
                     agent=agent_lower,
@@ -129,7 +132,7 @@ class ChatService:
                     history=history,
                     file_url=file_url,
                 )
-            except WebhookNotConfiguredError as e:
+            except _N8nError as e:
                 raise ChatError(str(e))
         else:
             result = self._call_general_openai(message, history)

@@ -2,13 +2,35 @@ import os
 from datetime import timedelta
 
 
+_INSECURE_DEFAULTS = {"dev-secret-key-change-me", "jwt-secret-key-change-me"}
+
+
+def _require_secret(name: str, value: str, env: str) -> str:
+    if env == "production" and (not value or value in _INSECURE_DEFAULTS):
+        raise RuntimeError(
+            f"FATAL: {name} is missing or set to an insecure default in production. "
+            f"Set a strong value via the {name.upper()} environment variable before deploying."
+        )
+    return value
+
+
 class Config:
-    SECRET_KEY: str = os.environ.get("SESSION_SECRET", "dev-secret-key-change-me")
+    _env: str = os.environ.get("FLASK_ENV", "development")
+
+    SECRET_KEY: str = _require_secret(
+        "SECRET_KEY",
+        os.environ.get("SESSION_SECRET", "dev-secret-key-change-me"),
+        os.environ.get("FLASK_ENV", "development"),
+    )
 
     SQLALCHEMY_DATABASE_URI: str = os.environ.get("DATABASE_URL", "sqlite:///preddi.db")
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
-    JWT_SECRET_KEY: str = os.environ.get("JWT_SECRET_KEY", "jwt-secret-key-change-me")
+    JWT_SECRET_KEY: str = _require_secret(
+        "JWT_SECRET_KEY",
+        os.environ.get("JWT_SECRET_KEY", "jwt-secret-key-change-me"),
+        os.environ.get("FLASK_ENV", "development"),
+    )
     JWT_TOKEN_LOCATION: list = ["cookies"]
     JWT_COOKIE_HTTPONLY: bool = True
     JWT_COOKIE_SECURE: bool = os.environ.get("FLASK_ENV", "development") == "production"
