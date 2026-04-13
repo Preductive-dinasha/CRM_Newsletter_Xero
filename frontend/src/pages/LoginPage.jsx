@@ -2,7 +2,7 @@ import { useState } from "react";
 import { login } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 
-export default function LoginPage() {
+export default function LoginPage({ onSignUp }) {
   const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,6 +22,9 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  const inputClass = "w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all";
+  const inputStyle = { borderColor: "#e5e7eb", color: "#0A222C", background: "#fafafa" };
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: "#F9F9F9" }}>
@@ -51,18 +54,14 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all"
-              style={{
-                borderColor: "#e5e7eb",
-                color: "#0A222C",
-                background: "#fafafa",
-              }}
+              className={inputClass}
+              style={inputStyle}
               onFocus={(e) => { e.target.style.borderColor = "#308AD8"; e.target.style.boxShadow = "0 0 0 3px rgba(48,138,216,0.1)"; }}
               onBlur={(e) => { e.target.style.borderColor = "#e5e7eb"; e.target.style.boxShadow = "none"; }}
             />
           </div>
 
-          <div className="mb-6">
+          <div className="mb-2">
             <label className="block text-sm font-medium mb-1.5" style={{ color: "#0A222C" }}>Password</label>
             <input
               type="password"
@@ -70,15 +69,22 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-all"
-              style={{
-                borderColor: "#e5e7eb",
-                color: "#0A222C",
-                background: "#fafafa",
-              }}
+              className={inputClass}
+              style={inputStyle}
               onFocus={(e) => { e.target.style.borderColor = "#308AD8"; e.target.style.boxShadow = "0 0 0 3px rgba(48,138,216,0.1)"; }}
               onBlur={(e) => { e.target.style.borderColor = "#e5e7eb"; e.target.style.boxShadow = "none"; }}
             />
+          </div>
+
+          <div className="flex justify-end mb-6">
+            <button
+              type="button"
+              className="text-xs hover:underline"
+              style={{ color: "#308AD8" }}
+              onClick={() => {}}
+            >
+              Forgot password?
+            </button>
           </div>
 
           <button
@@ -89,6 +95,18 @@ export default function LoginPage() {
           >
             {loading ? "Signing in…" : "Sign in"}
           </button>
+
+          <p className="text-center text-sm mt-4" style={{ color: "#6b7280" }}>
+            Don't have an account?{" "}
+            <button
+              type="button"
+              onClick={onSignUp}
+              className="font-medium hover:underline"
+              style={{ color: "#308AD8" }}
+            >
+              Sign up
+            </button>
+          </p>
         </form>
       </div>
     </div>

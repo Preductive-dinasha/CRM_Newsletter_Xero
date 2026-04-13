@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
 import ChatPage from "./pages/ChatPage";
 
 function AppContent() {
   const { user, loading } = useAuth();
+  const [page, setPage] = useState("login");
 
   if (loading) {
     return (
@@ -23,7 +26,17 @@ function AppContent() {
     );
   }
 
-  return user ? <ChatPage /> : <LoginPage />;
+  if (user) return <ChatPage />;
+
+  if (page === "signup") {
+    return <SignupPage onSignIn={() => setPage("login")} />;
+  }
+
+  return (
+    <LoginPage
+      onSignUp={() => setPage("signup")}
+    />
+  );
 }
 
 export default function App() {

@@ -5,6 +5,7 @@ import { SkillBadge } from "./SkillSelector";
 
 function Message({ msg }) {
   const isUser = msg.role === "user";
+  const isError = msg.isError;
 
   return (
     <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
@@ -26,11 +27,25 @@ function Message({ msg }) {
           style={
             isUser
               ? { background: "#308AD8", color: "white", borderBottomRightRadius: 4 }
+              : isError
+              ? { background: "#fef2f2", color: "#dc2626", border: "1px solid #fecaca", borderBottomLeftRadius: 4 }
               : { background: "white", color: "#0A222C", border: "1px solid #e5e7eb", borderBottomLeftRadius: 4 }
           }
         >
           {isUser ? (
-            <p style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{msg.content}</p>
+            <>
+              {msg.content && (
+                <p style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{msg.content}</p>
+              )}
+              {msg.file_preview && (
+                <img
+                  src={msg.file_preview}
+                  alt="attachment"
+                  className="mt-2 rounded-lg max-w-full"
+                  style={{ maxHeight: 240 }}
+                />
+              )}
+            </>
           ) : (
             <div className="prose">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
@@ -46,7 +61,9 @@ function Message({ msg }) {
           )}
         </div>
         <span className="text-xs" style={{ color: "#9ca3af" }}>
-          {msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}
+          {msg.created_at
+            ? new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+            : ""}
         </span>
       </div>
 
@@ -83,7 +100,7 @@ function TypingIndicator() {
             className="w-2 h-2 rounded-full"
             style={{
               background: "#308AD8",
-              animation: `bounce 1.2s ${i * 0.2}s infinite`,
+              animation: `typingBounce 1.2s ${i * 0.2}s infinite`,
               opacity: 0.7,
             }}
           />
@@ -101,7 +118,7 @@ export default function MessageList({ messages, isTyping }) {
   }, [messages, isTyping]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-6">
+    <div className="flex-1 overflow-y-auto px-4 py-6 scrollbar-thin" style={{ scrollbarColor: "#e5e7eb transparent" }}>
       <div className="max-w-3xl mx-auto flex flex-col gap-4">
         {messages.length === 0 && !isTyping && (
           <div className="flex flex-col items-center justify-center h-64 text-center">
@@ -117,7 +134,7 @@ export default function MessageList({ messages, isTyping }) {
               How can I help you?
             </h3>
             <p className="text-sm mt-1" style={{ color: "#9ca3af" }}>
-              Type a message, or use @ to select a skill
+              Type a message, use @ to pick a skill, or select an agent below
             </p>
           </div>
         )}
@@ -131,7 +148,7 @@ export default function MessageList({ messages, isTyping }) {
       </div>
 
       <style>{`
-        @keyframes bounce {
+        @keyframes typingBounce {
           0%, 60%, 100% { transform: translateY(0); }
           30% { transform: translateY(-6px); }
         }

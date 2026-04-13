@@ -32,7 +32,7 @@ function SessionItem({ session, active, onSelect, onDelete }) {
       {(hovering || active) && (
         <button
           onClick={handleDelete}
-          className="opacity-0 group-hover:opacity-100 flex-shrink-0 p-0.5 rounded transition-all"
+          className="flex-shrink-0 p-0.5 rounded transition-all opacity-0 group-hover:opacity-100"
           style={{ color: confirming ? "#f87171" : "rgba(255,255,255,0.5)" }}
           title={confirming ? "Click again to delete" : "Delete"}
         >
@@ -78,11 +78,7 @@ export default function Sidebar({ activeSessionId, onSessionSelect, onNewSession
       setSessions((prev) => prev.filter((s) => s.session_id !== sessionId));
       if (activeSessionId === sessionId) {
         const remaining = sessions.filter((s) => s.session_id !== sessionId);
-        if (remaining.length > 0) {
-          onSessionSelect(remaining[0].session_id);
-        } else {
-          onSessionSelect(null);
-        }
+        onSessionSelect(remaining.length > 0 ? remaining[0].session_id : null);
       }
     } catch {}
   };
@@ -95,7 +91,7 @@ export default function Sidebar({ activeSessionId, onSessionSelect, onNewSession
 
   return (
     <aside
-      className="flex flex-col h-full w-64 flex-shrink-0"
+      className="flex flex-col h-full w-full"
       style={{ background: "#0A1929", borderRight: "1px solid rgba(255,255,255,0.08)" }}
     >
       <div className="p-4 flex-shrink-0">

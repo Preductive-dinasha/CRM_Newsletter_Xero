@@ -4,11 +4,10 @@
 Preddi is a full-stack AI chat interface built with React + Vite + TailwindCSS (frontend) and Flask Clean Architecture (backend). It connects to n8n webhooks for specialist agents (@CRM, @Newsletter, @Xero) and OpenAI for general queries.
 
 ## Recent Changes
+- 2026-04-13: Task #3 complete — SignupPage with real-time password strength, mic button (Web Speech API), agent selector dropdown with localStorage persistence, image thumbnail preview in input, inline file images in bubbles, error state styling, agent badge in header, sidebar mobile toggle
 - 2026-04-13: Full rebuild — React+Vite+Tailwind frontend, Flask Clean Architecture backend, PostgreSQL, JWT httpOnly cookies
 - 2026-03-11: Added skill selector — type `@` in chat to pick a skill; sent as `skill` field in n8n payload
 - 2026-02-10: Rebranded to "Preddi", switched to light theme (#F9F9F9 bg, #308AD8 accent, #0A222C text)
-- 2026-02-10: Improved n8n response parser to handle more response formats
-- 2026-02-10: Initial build - Flask app with chat UI, n8n integration, file/image upload, voice-to-text
 
 ## Architecture
 - **Frontend**: React + Vite + TailwindCSS (Vite dev server on port 5000 in dev)
@@ -24,8 +23,8 @@ backend/
   run.py                   # Flask entrypoint (PORT env var, default 5000)
   migrations/              # Flask-Migrate Alembic migrations
   app/
-    __init__.py            # App factory: CORS, JWT, migrations, seed user
-    config.py              # Config classes (Config, TestingConfig)
+    __init__.py            # App factory: CORS, JWT, migrations, seed user, SPA catch-all
+    config.py              # Config classes with production secret validation
     extensions.py          # db, jwt, migrate, bcrypt
     models/
       user.py              # users table
@@ -43,9 +42,9 @@ backend/
       summarisation_service.py  # compress history at 30 turns
       file_service.py      # save uploaded files
     routes/
-      auth_routes.py       # /api/auth/login, /api/auth/logout, /api/auth/refresh
+      auth_routes.py       # /api/auth/register, /api/auth/login, /api/auth/logout, /api/auth/refresh
       session_routes.py    # /api/sessions CRUD
-      chat_routes.py       # /api/chat/<id> POST, /api/chat/<id>/history GET
+      chat_routes.py       # /api/chat/<id> POST, /api/chat/<id>/history GET, /api/upload POST
       user_routes.py       # /api/users/me
   tests/
     conftest.py
@@ -57,62 +56,75 @@ backend/
 frontend/
   vite.config.js           # Vite config: port 5000, proxy /api → localhost:8000
   src/
-    App.jsx                # Root: AuthProvider + AppContent (login or chat)
+    App.jsx                # Root: AuthProvider + page state (login/signup/chat)
     main.jsx
-    index.css              # Tailwind + custom prose styles
+    index.css              # Tailwind + custom prose/scrollbar styles
     api/
-      client.js            # Axios with credentials + 401 → auth:unauthorized event
-      auth.js              # login, logout, getMe
+      client.js            # Axios with credentials + CSRF interceptor + 401 → auth:unauthorized
+      auth.js              # login, logout, getMe, register
       sessions.js          # getSessions, createSession, deleteSession, updateTitle, getHistory, getSkills
       chat.js              # sendMessage (multipart form)
     context/
       AuthContext.jsx      # useAuth hook, user state, logout
+    hooks/
+      useSpeech.js         # Web Speech API wrapper (start/stop/toggle, pulsing ring)
     pages/
-      LoginPage.jsx        # Login form with Preddi branding
-      ChatPage.jsx         # Main chat: sidebar + message list + input
+      LoginPage.jsx        # Login form — Forgot password? link + Sign up link
+      SignupPage.jsx        # Signup form — name/email/company/password with strength indicator
+      ChatPage.jsx         # Main chat: sidebar + agent badge header + message list + input
     components/
-      Sidebar.jsx          # Dark sidebar: Preddi logo, New Chat, session list, user info
-      MessageList.jsx      # Messages with typing indicator, markdown rendering
-      MessageInput.jsx     # Textarea, file attach, @ skill selector button
-      SkillSelector.jsx    # Dropdown for @ skill selection, SkillChip, SkillBadge
+      Sidebar.jsx          # Dark sidebar: Preddi logo, New Chat, session list, user info/logout
+      MessageList.jsx      # Messages with typing indicator, markdown, error state, media_url images
+      MessageInput.jsx     # Textarea + file attach + mic (pulsing ring) + agent dropdown + send
+      SkillSelector.jsx    # @ dropdown for skill selection, SkillChip, SkillBadge
 ```
 
 ## Key Features
-- Claude/ChatGPT-style UI: dark sidebar, light chat area
+- Claude/ChatGPT-style UI: dark sidebar (#0A1929), light chat area (#F9F9F9, #308AD8 accent)
 - JWT auth via httpOnly cookies (no localStorage for tokens)
+- Signup with real-time password strength indicator (5 criteria, color-coded bars)
 - Agent routing: @CRM / @Newsletter / @Xero → n8n webhooks; General → OpenAI
-- @-trigger skill selector in chat input
-- Session management with auto-titling (OpenAI generates title from first message)
-- Conversation history summarisation at 30 turns (oldest 20 compressed via OpenAI)
-- File upload support (image, PDF, DOCX, etc.)
-- Markdown rendering in agent responses
-- 25 backend unit tests all passing
+- Agent selector dropdown in InputBar — persists last selection to localStorage
+- Agent badge in chat header shows active non-General agent
+- @-trigger skill selector (type @ or click @ button)
+- Mic button with Web Speech API — pulsing ring animation while recording
+- File attach: drag-drop, paste clipboard images, file picker; image thumbnail preview before send
+- Inline image rendering in user bubbles (file_preview) and agent bubbles (media_url)
+- Session management with auto-titling (OpenAI, hard-capped at 6 words)
+- Conversation summarisation at 30 turns
+- Error messages rendered gracefully in chat (isError styling)
+- Sidebar collapse toggle (hamburger button in header)
+- 26 backend unit tests all passing
 
 ## Environment Variables
 - `DATABASE_URL` - PostgreSQL connection string
-- `SESSION_SECRET` - Flask session secret
+- `SESSION_SECRET` - Flask session secret (required in production)
+- `JWT_SECRET_KEY` - JWT signing secret (required in production)
 - `N8N_BEARER_TOKEN` - n8n webhook auth token
-- `N8N_WEBHOOK_URL` - Base n8n webhook URL (for legacy support)
+- `N8N_WEBHOOK_URL` - Base n8n webhook URL (legacy)
 - `N8N_CRM_WEBHOOK_URL`, `N8N_NEWSLETTER_WEBHOOK_URL`, `N8N_XERO_WEBHOOK_URL` - Per-agent webhooks
 - `AI_INTEGRATIONS_OPENAI_API_KEY` - OpenAI API key (via Replit integration)
 - `AI_INTEGRATIONS_OPENAI_BASE_URL` - OpenAI base URL (via Replit integration)
 - `PREDDI_SKILLS` - Comma-separated skill names (default: CRM,Newsletter,Xero)
-- `JWT_SECRET_KEY` - JWT signing secret
 
 ## Seed User
 - Email: dinasha@preductive.co
 - Password: Admin@1234
 
 ## API Endpoints
+- `POST /api/auth/register` - Register new user (f_name, l_name, email, password, company?)
 - `POST /api/auth/login` - Login, sets httpOnly JWT cookie
 - `POST /api/auth/logout` - Clear JWT cookie
+- `POST /api/auth/refresh` - Refresh access token
 - `GET /api/users/me` - Current user info
 - `GET /api/sessions` - List user's sessions
 - `POST /api/sessions` - Create new session
 - `PATCH /api/sessions/<id>` - Update session title
 - `DELETE /api/sessions/<id>` - Delete session
-- `POST /api/chat/<session_id>` - Send message (multipart: message, skill, file)
+- `POST /api/chat/<session_id>` - Send message (multipart: message, skill/agent, file)
 - `GET /api/chat/<session_id>/history` - Get chat history
+- `POST /api/upload` - Upload file separately
+- `GET /api/uploads/<filename>` - Serve uploaded files
 - `GET /api/skills` - Available skills list
 - `GET /api/health` - Health check
 
@@ -122,10 +134,15 @@ bash start.sh
 ```
 Flask starts on port 8000, Vite serves frontend on port 5000.
 
+## Deployment
+- Build: `cd frontend && npm install && npm run build`
+- Run: `gunicorn --bind=0.0.0.0:5000 --reuse-port --workers=2 backend.run:app`
+- Flask serves built `frontend/dist/` via SPA catch-all route in production
+
 ## User Preferences
 - AI agent name: "Preddi"
 - Light chat area: background #F9F9F9, accent #308AD8, text #0A222C
-- Dark sidebar like Claude/ChatGPT
+- Dark sidebar like Claude/ChatGPT (#0A1929)
 - Python Flask backend
 - React + Vite + Tailwind frontend (no Next.js)
 - JWT in httpOnly cookies (not localStorage)

@@ -1,10 +1,31 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import Sidebar from "../components/Sidebar";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
-import { getHistory } from "../api/sessions";
+import { getHistory, getSkills } from "../api/sessions";
 import { sendMessage } from "../api/chat";
 import { createSession } from "../api/sessions";
+
+const AGENT_LS_KEY = "preddi_last_agent";
+const SKILL_COLORS = {
+  CRM: "#f59e0b",
+  Newsletter: "#3b82f6",
+  Xero: "#22c55e",
+};
+
+function AgentBadge({ agent }) {
+  if (!agent || agent === "General") return null;
+  const color = SKILL_COLORS[agent] || "#308AD8";
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
+      style={{ background: `${color}18`, color, border: `1px solid ${color}44` }}
+    >
+      <span className="w-1.5 h-1.5 rounded-full" style={{ background: color }} />
+      @{agent}
+    </span>
+  );
+}
 
 export default function ChatPage() {
   const [sessions, setSessions] = useState([]);
@@ -13,6 +34,21 @@ export default function ChatPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [sessionTitle, setSessionTitle] = useState("New Chat");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [skills, setSkills] = useState([]);
+
+  const savedAgent = typeof window !== "undefined" ? (localStorage.getItem(AGENT_LS_KEY) || "General") : "General";
+  const [agent, setAgent] = useState(savedAgent);
+
+  const handleAgentChange = useCallback((a) => {
+    setAgent(a);
+    localStorage.setItem(AGENT_LS_KEY, a);
+  }, []);
+
+  useEffect(() => {
+    getSkills()
+      .then((res) => setSkills(res.data.skills || []))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (!activeSessionId) {
@@ -21,9 +57,7 @@ export default function ChatPage() {
       return;
     }
     getHistory(activeSessionId)
-      .then((res) => {
-        setMessages(res.data.history || []);
-      })
+      .then((res) => setMessages(res.data.history || []))
       .catch(() => setMessages([]));
   }, [activeSessionId]);
 
@@ -45,6 +79,7 @@ export default function ChatPage() {
   const handleSend = useCallback(async ({ message, skill, file }) => {
     if (!message.trim() && !file) return;
 
+    const effectiveSkill = skill || (agent !== "General" ? agent : null);
     let currentSessionId = activeSessionId;
 
     if (!currentSessionId) {
@@ -62,14 +97,14 @@ export default function ChatPage() {
     const userMsg = {
       role: "user",
       content: message,
-      skill: skill || null,
+      skill: effectiveSkill || null,
       created_at: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, userMsg]);
     setIsTyping(true);
 
     try {
-      const res = await sendMessage(currentSessionId, message, skill, file);
+      const res = await sendMessage(currentSessionId, message, effectiveSkill, file);
       const data = res.data;
       const assistantMsg = {
         role: "assistant",
@@ -92,24 +127,30 @@ export default function ChatPage() {
         role: "assistant",
         content: err.response?.data?.error || "Something went wrong. Please try again.",
         created_at: new Date().toISOString(),
+        isError: true,
       };
       setMessages((prev) => [...prev, errMsg]);
     } finally {
       setIsTyping(false);
     }
-  }, [activeSessionId]);
+  }, [activeSessionId, agent]);
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: "#F9F9F9" }}>
-      {sidebarOpen && (
-        <Sidebar
-          activeSessionId={activeSessionId}
-          onSessionSelect={handleSessionSelect}
-          onNewSession={handleNewSession}
-          sessions={sessions}
-          setSessions={setSessions}
-        />
-      )}
+      <div
+        className={`transition-all duration-300 flex-shrink-0 ${sidebarOpen ? "" : "hidden"}`}
+        style={{ width: sidebarOpen ? 260 : 0 }}
+      >
+        {sidebarOpen && (
+          <Sidebar
+            activeSessionId={activeSessionId}
+            onSessionSelect={handleSessionSelect}
+            onNewSession={handleNewSession}
+            sessions={sessions}
+            setSessions={setSessions}
+          />
+        )}
+      </div>
 
       <div className="flex-1 flex flex-col min-w-0">
         <header
@@ -118,9 +159,9 @@ export default function ChatPage() {
         >
           <button
             onClick={() => setSidebarOpen((v) => !v)}
-            className="p-2 rounded-lg transition-all"
+            className="p-2 rounded-lg transition-all flex-shrink-0"
             style={{ color: "#9ca3af" }}
-            title="Toggle sidebar"
+            title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
             onMouseEnter={(e) => { e.currentTarget.style.background = "#f3f4f6"; e.currentTarget.style.color = "#0A222C"; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#9ca3af"; }}
           >
@@ -128,13 +169,22 @@ export default function ChatPage() {
               <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
             </svg>
           </button>
-          <h1 className="font-semibold text-base truncate" style={{ color: "#0A222C" }}>
+
+          <h1 className="font-semibold text-base truncate flex-1" style={{ color: "#0A222C" }}>
             {sessionTitle}
           </h1>
+
+          <AgentBadge agent={agent} />
         </header>
 
         <MessageList messages={messages} isTyping={isTyping} />
-        <MessageInput onSend={handleSend} disabled={isTyping} />
+        <MessageInput
+          onSend={handleSend}
+          disabled={isTyping}
+          agent={agent}
+          onAgentChange={handleAgentChange}
+          skills={skills}
+        />
       </div>
     </div>
   );
