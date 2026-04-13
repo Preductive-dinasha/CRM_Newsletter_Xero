@@ -15,7 +15,7 @@ class Config:
     JWT_COOKIE_SAMESITE: str = "Lax"
     JWT_ACCESS_TOKEN_EXPIRES: timedelta = timedelta(hours=1)
     JWT_REFRESH_TOKEN_EXPIRES: timedelta = timedelta(days=30)
-    JWT_COOKIE_CSRF_PROTECT: bool = False
+    JWT_COOKIE_CSRF_PROTECT: bool = True
 
     OPENAI_API_KEY: str = os.environ.get("AI_INTEGRATIONS_OPENAI_API_KEY") or os.environ.get("OPENAI_API_KEY", "")
     OPENAI_BASE_URL: str = os.environ.get("AI_INTEGRATIONS_OPENAI_BASE_URL") or ""
@@ -36,6 +36,7 @@ class TestingConfig(Config):
     TESTING: bool = True
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///:memory:"
     JWT_COOKIE_SECURE: bool = False
+    JWT_COOKIE_CSRF_PROTECT: bool = False
     WTF_CSRF_ENABLED: bool = False
     OPENAI_API_KEY: str = "test-key"
     OPENAI_BASE_URL: str = ""

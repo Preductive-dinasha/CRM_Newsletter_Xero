@@ -55,6 +55,35 @@ class TestAgentRouting:
             assert call_kwargs["agent"] == "crm"
             assert result["reply"] == "CRM reply"
 
+    def test_routes_to_crm_with_at_prefix(self, app):
+        with app.app_context():
+            mock_chat_repo = MagicMock()
+            mock_session_repo = MagicMock()
+            mock_n8n = MagicMock()
+            mock_summarise = MagicMock()
+
+            mock_session_repo.find_by_id.return_value = make_mock_session()
+            mock_chat_repo.count_by_session_id.return_value = 2
+            mock_chat_repo.find_by_session_id.return_value = make_mock_history(2)
+            mock_n8n.send_to_agent.return_value = {"reply": "CRM reply", "media_url": None}
+            mock_summarise.maybe_summarise.return_value = False
+
+            service = ChatService(
+                chat_repo=mock_chat_repo,
+                session_repo=mock_session_repo,
+                n8n_service=mock_n8n,
+                summarisation_service=mock_summarise,
+            )
+
+            result = service.send_message(
+                user_id=42, session_id=1, message="Hello CRM", agent="@CRM"
+            )
+
+            mock_n8n.send_to_agent.assert_called_once()
+            call_kwargs = mock_n8n.send_to_agent.call_args.kwargs
+            assert call_kwargs["agent"] == "crm"
+            assert result["reply"] == "CRM reply"
+
     def test_routes_to_general_when_no_agent(self, app):
         with app.app_context():
             mock_chat_repo = MagicMock()

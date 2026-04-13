@@ -117,9 +117,8 @@ class ChatService:
 
         history = self._history_as_list(session_id)
 
-        agent_lower = (agent or "").lower().strip()
+        agent_lower = (agent or "").lower().strip().lstrip("@")
 
-        webhook_not_configured_msg = None
         if agent_lower and agent_lower in N8N_AGENTS:
             try:
                 result = self.n8n_service.send_to_agent(
@@ -131,8 +130,7 @@ class ChatService:
                     file_url=file_url,
                 )
             except WebhookNotConfiguredError as e:
-                webhook_not_configured_msg = str(e)
-                result = {"reply": str(e), "media_url": None}
+                raise ChatError(str(e))
         else:
             result = self._call_general_openai(message, history)
 
@@ -154,5 +152,4 @@ class ChatService:
             "reply": result["reply"],
             "media_url": result.get("media_url"),
             "title": session.title,
-            "webhook_not_configured": webhook_not_configured_msg is not None,
         }
