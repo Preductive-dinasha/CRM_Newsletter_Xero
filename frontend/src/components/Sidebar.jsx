@@ -109,7 +109,7 @@ export default function Sidebar({ activeSessionId, onSessionSelect, onNewSession
   };
 
   const initials = user
-    ? `${user.f_name?.[0] || ""}${user.l_name?.[0] || ""}`.toUpperCase() || user.email[0].toUpperCase()
+    ? `${user.f_name?.[0] || ""}${user.l_name?.[0] || ""}`.toUpperCase() || user.email?.[0]?.toUpperCase() || "?"
     : "?";
 
   const displayName = user ? `${user.f_name || ""} ${user.l_name || ""}`.trim() || user.email : "";
