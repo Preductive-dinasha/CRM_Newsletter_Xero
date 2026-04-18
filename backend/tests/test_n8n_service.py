@@ -206,3 +206,12 @@ class TestNormaliseSpacing:
     def test_plain_text_unchanged(self):
         text = "Hello, how can I help you today?"
         assert self.service._normalise_spacing(text) == text
+
+    def test_already_newlined_text_skipped(self):
+        text = "Name:  Andrew  Nicol\n- Email: a@b.com"
+        result = self.service._normalise_spacing(text)
+        assert result == text
+
+    def test_single_space_text_unchanged(self):
+        text = "Andrew Nicol works at Acme Corp in Hamilton New Zealand"
+        assert self.service._normalise_spacing(text) == text
