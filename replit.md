@@ -87,18 +87,18 @@ frontend/
 - Claude/ChatGPT-style UI: dark sidebar (#0A1929), light chat area (#F9F9F9, #308AD8 accent)
 - JWT auth via httpOnly cookies (no localStorage for tokens)
 - Signup with real-time password strength indicator (5 criteria, color-coded bars)
-- Agent routing: @CRM / @Newsletter / @Xero → n8n webhooks; General → OpenAI
-- Agent selector dropdown in InputBar — persists last selection to localStorage
-- Agent badge in chat header shows active non-General agent
+- Agent routing: @CRM / @Newsletter / @Xero — all via n8n webhooks (no General/OpenAI path)
+- Agent selector dropdown in InputBar — persists last selection to localStorage; validated against allowed list on load
+- Agent badge in chat header shows active agent
 - @-trigger skill selector (type @ or click @ button)
 - Mic button with Web Speech API — pulsing ring animation while recording
-- File attach: drag-drop, paste clipboard images, file picker; image thumbnail preview before send
-- Inline image rendering in user bubbles (file_preview) and agent bubbles (media_url)
-- Session management with auto-titling (OpenAI, hard-capped at 6 words)
-- Conversation summarisation at 30 turns
+- File attach: drag-drop, paste clipboard images, file picker; image thumbnail preview before send; document filename chip for non-image files
+- Inline image rendering in user bubbles (file_preview blob URL) and agent bubbles (media_url)
+- Session management with auto-titling (first 6 words of reply, no LLM)
+- Conversation summarisation at 30 turns (word-based compression, no LLM)
 - Error messages rendered gracefully in chat (isError styling)
 - Sidebar collapse toggle (hamburger button in header)
-- 26 backend unit tests all passing
+- 40 backend unit tests all passing
 
 ## Environment Variables
 - `DATABASE_URL` - PostgreSQL connection string

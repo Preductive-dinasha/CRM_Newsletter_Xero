@@ -45,10 +45,12 @@ export default function ChatPage() {
   const [skills, setSkills] = useState([]);
 
   const defaultAgent = "CRM";
+  const ALLOWED_AGENTS = ["CRM", "Newsletter", "Xero"];
   const savedAgent = typeof window !== "undefined"
     ? (localStorage.getItem(AGENT_LS_KEY) || defaultAgent)
     : defaultAgent;
-  const [agent, setAgent] = useState(savedAgent);
+  const validatedAgent = ALLOWED_AGENTS.includes(savedAgent) ? savedAgent : defaultAgent;
+  const [agent, setAgent] = useState(validatedAgent);
 
   const handleAgentChange = useCallback((a) => {
     setAgent(a);
