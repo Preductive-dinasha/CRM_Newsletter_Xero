@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from typing import Optional
 import requests
 from flask import current_app
@@ -75,6 +76,25 @@ class N8nService:
         except (json.JSONDecodeError, KeyError, TypeError) as e:
             raise N8nError(f"Invalid response from agent: {e}")
 
+    def _normalise_spacing(self, text: str) -> str:
+        if not isinstance(text, str):
+            return text
+        # Skip if text already has newlines — it's already structured
+        if "\n" in text:
+            return text
+        # "contact:- Item" → "contact:\n- Item" (first list item glued to intro)
+        text = re.sub(r":- ", ":\n- ", text)
+        # "  - Item" (2+ spaces + dash + space) → "\n- Item" (markdown bullet)
+        text = re.sub(r"  +- ", "\n- ", text)
+        # "  N) " (2+ spaces + digit(s) + paren + space) → "\nN. " (numbered list)
+        text = re.sub(r"  +(\d+)\) ", r"\n\1. ", text)
+        # Trailing numbered item without trailing space "  N)" at end of string
+        text = re.sub(r"  +(\d+)\)$", r"\n\1.", text)
+        # Catch-all: any remaining 2+ spaces become a newline (handles unlabelled
+        # paragraph transitions like "50028  What do you want...")
+        text = re.sub(r"  +", "\n", text)
+        return text
+
     def _parse_response(self, data: dict | list) -> dict:
         if isinstance(data, list) and len(data) > 0:
             data = data[0]
@@ -125,6 +145,7 @@ class N8nService:
 
         if isinstance(reply, str):
             reply = reply.replace("\\n", "\n")
+            reply = self._normalise_spacing(reply)
 
         reply = str(reply).strip() if reply else ""
 

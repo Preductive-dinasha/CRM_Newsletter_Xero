@@ -4,10 +4,10 @@
 Preddi is a full-stack AI chat interface built with React + Vite + TailwindCSS (frontend) and Flask Clean Architecture (backend). It routes all messages through n8n webhooks to specialist agents (@CRM, @Newsletter, @Xero).
 
 ## Recent Changes
+- 2026-04-18: n8n spacing normalisation — added `_normalise_spacing` to N8nService; converts n8n's double-space separator convention (`  - `, `  N)`) to proper markdown bullets and numbered lists; catch-all converts any remaining 2+ spaces to newlines; only fires when no real newlines are present (safe for already-structured responses); 47/47 backend tests passing
 - 2026-04-18: React Router setup — BrowserRouter + Routes (/login, /signup, /) replacing page-state; LoginPage/SignupPage use useNavigate; protected route redirects to /login when unauthenticated
 - 2026-04-18: n8n response rendering fix — _parse_response rewrote with safe JSON guards: unwraps double-encoded strings, restores \\n to real newlines, only JSON.loads on { or [ prefixed strings; fixed duplicate React key (msg.id || i → `${msg.id}-${i}`)
 - 2026-04-18: Document file attachment in user bubbles — non-image files show a file icon + filename chip in the message bubble (file_name captured in ChatPage, rendered in MessageList)
-- 2026-04-18: 40 backend tests passing (13 new tests for _parse_response covering all edge cases)
 - 2026-04-13: Removed inbuilt AI (OpenAI/General) agent — all messages now route to n8n webhooks only; backend raises ChatError if no valid agent selected; title generation uses first-6-words; summarisation uses word-based compression; agent dropdown always shows @CRM/@Newsletter/@Xero
 - 2026-04-13: Task #3 fixes — auto-redirect after signup (no success screen), full Tailwind-only refactor (removed all inline style={} and <style> tags), file attachment inline preview in chat bubbles (file_preview blob URL on user messages), sidebar mobile hamburger toggle
 - 2026-04-13: Task #3 complete — SignupPage with real-time password strength, mic button (Web Speech API), agent selector dropdown with localStorage persistence, image thumbnail preview in input, inline file images in bubbles, error state styling, agent badge in header, sidebar mobile toggle

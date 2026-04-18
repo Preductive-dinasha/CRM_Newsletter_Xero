@@ -155,3 +155,54 @@ class TestParseResponse:
     def test_non_dict_data_returns_stringified(self):
         result = self.service._parse_response("just a string")
         assert result["reply"] == "just a string"
+
+
+class TestNormaliseSpacing:
+    def setup_method(self):
+        self.service = N8nService()
+
+    def test_no_change_when_newlines_present(self):
+        text = "Line one\n- Item A\n- Item B"
+        assert self.service._normalise_spacing(text) == text
+
+    def test_double_space_bullet_converted(self):
+        text = "Here is the list:- First item  - Second item  - Third item"
+        result = self.service._normalise_spacing(text)
+        assert "\n- First item" in result
+        assert "\n- Second item" in result
+        assert "\n- Third item" in result
+
+    def test_colon_dash_first_item_converted(self):
+        text = "Contact details:- Name: Andrew  - Email: a@b.com"
+        result = self.service._normalise_spacing(text)
+        assert ":\n- Name: Andrew" in result
+
+    def test_numbered_options_converted(self):
+        text = "What next?  1) Show details  2) Update field  3) Create deal"
+        result = self.service._normalise_spacing(text)
+        assert "\n1. Show details" in result
+        assert "\n2. Update field" in result
+        assert "\n3. Create deal" in result
+
+    def test_real_n8n_crm_response(self):
+        text = (
+            "I've found the contact:- Name: Andrew Nicol"
+            "  - Email: andrew@nicol.co.nz"
+            "  - Job title: Developer"
+            "  What do you want to do?  1) Show more details  2) Update a field"
+        )
+        result = self.service._normalise_spacing(text)
+        assert "\n- Name:" in result or ":\n- Name:" in result
+        assert "\n- Email:" in result
+        assert "\n1. Show more details" in result
+        assert "\n2. Update a field" in result
+
+    def test_transition_paragraph_converted(self):
+        text = "Contact ID: 50028854423  What do you want to do?  1) Show details"
+        result = self.service._normalise_spacing(text)
+        assert "\nWhat do you want to do?" in result
+        assert "\n1. Show details" in result
+
+    def test_plain_text_unchanged(self):
+        text = "Hello, how can I help you today?"
+        assert self.service._normalise_spacing(text) == text
