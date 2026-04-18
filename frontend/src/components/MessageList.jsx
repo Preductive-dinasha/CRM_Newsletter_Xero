@@ -50,6 +50,15 @@ function Message({ msg }) {
                   className="mt-2 rounded-lg max-w-full max-h-60"
                 />
               )}
+              {msg.file_name && !msg.file_preview && (
+                <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-white/20 border border-white/30">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 opacity-80">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                  </svg>
+                  <span className="text-xs truncate opacity-90 max-w-[180px]">{msg.file_name}</span>
+                </div>
+              )}
             </>
           ) : (
             <div className="prose">

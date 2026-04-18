@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
@@ -12,9 +12,8 @@ function ChatIcon() {
   );
 }
 
-function AppContent() {
+function AppRoutes() {
   const { user, loading } = useAuth();
-  const [page, setPage] = useState("login");
 
   if (loading) {
     return (
@@ -29,19 +28,34 @@ function AppContent() {
     );
   }
 
-  if (user) return <ChatPage />;
-
-  if (page === "signup") {
-    return <SignupPage onSignIn={() => setPage("login")} />;
-  }
-
-  return <LoginPage onSignUp={() => setPage("signup")} />;
+  return (
+    <Routes>
+      <Route
+        path="/login"
+        element={user ? <Navigate to="/" replace /> : <LoginPage />}
+      />
+      <Route
+        path="/signup"
+        element={user ? <Navigate to="/" replace /> : <SignupPage />}
+      />
+      <Route
+        path="/"
+        element={user ? <ChatPage /> : <Navigate to="/login" replace />}
+      />
+      <Route
+        path="*"
+        element={<Navigate to={user ? "/" : "/login"} replace />}
+      />
+    </Routes>
+  );
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }

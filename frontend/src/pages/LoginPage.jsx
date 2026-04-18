@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { login } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 
 const inputCls = "w-full px-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#fafafa] text-sm text-[#0A222C] outline-none transition-all focus:border-[#308AD8] focus:shadow-[0_0_0_3px_rgba(48,138,216,0.1)]";
 
-export default function LoginPage({ onSignUp }) {
+export default function LoginPage() {
+  const navigate = useNavigate();
   const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -92,7 +94,7 @@ export default function LoginPage({ onSignUp }) {
             Don't have an account?{" "}
             <button
               type="button"
-              onClick={onSignUp}
+              onClick={() => navigate("/signup")}
               className="font-medium text-[#308AD8] hover:underline"
             >
               Sign up

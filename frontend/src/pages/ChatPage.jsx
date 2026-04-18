@@ -106,8 +106,12 @@ export default function ChatPage() {
     }
 
     let filePreview = null;
-    if (file && file.type.startsWith("image/")) {
-      filePreview = URL.createObjectURL(file);
+    let fileName = null;
+    if (file) {
+      fileName = file.name;
+      if (file.type.startsWith("image/")) {
+        filePreview = URL.createObjectURL(file);
+      }
     }
 
     const userMsg = {
@@ -115,6 +119,7 @@ export default function ChatPage() {
       content: message,
       skill: effectiveSkill || null,
       file_preview: filePreview,
+      file_name: fileName,
       created_at: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, userMsg]);

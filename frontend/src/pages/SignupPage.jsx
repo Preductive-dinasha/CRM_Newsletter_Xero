@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { register } from "../api/auth";
 
 const RULES = [
@@ -66,7 +67,8 @@ function PasswordStrength({ password }) {
 
 const inputCls = "w-full px-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#fafafa] text-sm text-[#0A222C] outline-none transition-all focus:border-[#308AD8] focus:shadow-[0_0_0_3px_rgba(48,138,216,0.1)]";
 
-export default function SignupPage({ onSignIn }) {
+export default function SignupPage() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ f_name: "", l_name: "", email: "", password: "", confirm: "", company: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -104,7 +106,7 @@ export default function SignupPage({ onSignIn }) {
         l_name: form.l_name.trim(),
         company: form.company.trim() || undefined,
       });
-      onSignIn();
+      navigate("/login");
     } catch (err) {
       setError(err.response?.data?.error || "Registration failed. Please try again.");
     } finally {
@@ -229,7 +231,7 @@ export default function SignupPage({ onSignIn }) {
             Already have an account?{" "}
             <button
               type="button"
-              onClick={onSignIn}
+              onClick={() => navigate("/login")}
               className="font-medium text-[#308AD8] hover:underline"
             >
               Sign in
