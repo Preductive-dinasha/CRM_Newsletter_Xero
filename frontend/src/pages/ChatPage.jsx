@@ -130,6 +130,15 @@ export default function ChatPage() {
     try {
       const res = await sendMessage(currentSessionId, message, effectiveSkill, file);
       const data = res.data;
+
+      if (data.file_url) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m === userMsg ? { ...m, file_url: data.file_url } : m
+          )
+        );
+      }
+
       const assistantMsg = {
         role: "assistant",
         content: data.reply || data.message || "I'm sorry, I couldn't process that.",

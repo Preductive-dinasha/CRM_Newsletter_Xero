@@ -43,6 +43,8 @@ def send_message(session_id: int):
     except ChatError as e:
         return jsonify({"error": str(e)}), 400
 
+    if file_url:
+        result["file_url"] = file_url
     return jsonify(result), 200
 
 
