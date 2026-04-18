@@ -115,7 +115,7 @@ export default function MessageList({ messages, isTyping }) {
         )}
 
         {messages.map((msg, i) => (
-          <Message key={msg.id || i} msg={msg} />
+          <Message key={`${msg.id ?? ""}-${i}`} msg={msg} />
         ))}
 
         {isTyping && <TypingIndicator />}

@@ -80,7 +80,7 @@ class N8nService:
             data = data[0]
 
         if not isinstance(data, dict):
-            return {"reply": str(data), "media_url": None}
+            return {"reply": str(data).strip(), "media_url": None}
 
         reply = (
             data.get("reply")
@@ -93,23 +93,44 @@ class N8nService:
         )
 
         if isinstance(reply, dict):
-            reply = reply.get("reply") or reply.get("output") or str(reply)
+            reply = reply.get("reply") or reply.get("output") or reply.get("text") or str(reply)
 
-        try:
-            inner = json.loads(str(reply))
-            if isinstance(inner, dict):
-                reply = (
-                    inner.get("reply")
-                    or inner.get("output")
-                    or inner.get("text")
-                    or reply
-                )
-        except (json.JSONDecodeError, TypeError):
-            pass
+        if isinstance(reply, str):
+            stripped = reply.strip()
+            if stripped.startswith('"') and stripped.endswith('"'):
+                try:
+                    reply = json.loads(stripped)
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            elif stripped.startswith("{") or stripped.startswith("["):
+                try:
+                    inner = json.loads(stripped)
+                    if isinstance(inner, dict):
+                        reply = (
+                            inner.get("reply")
+                            or inner.get("output")
+                            or inner.get("text")
+                            or reply
+                        )
+                    elif isinstance(inner, list) and len(inner) > 0 and isinstance(inner[0], dict):
+                        first = inner[0]
+                        reply = (
+                            first.get("reply")
+                            or first.get("output")
+                            or first.get("text")
+                            or reply
+                        )
+                except (json.JSONDecodeError, TypeError):
+                    pass
+
+        if isinstance(reply, str):
+            reply = reply.replace("\\n", "\n")
+
+        reply = str(reply).strip() if reply else ""
 
         media_url = data.get("media_url") or data.get("image_url")
 
         return {
-            "reply": str(reply) if reply else "No response received.",
+            "reply": reply or "No response received.",
             "media_url": media_url,
         }

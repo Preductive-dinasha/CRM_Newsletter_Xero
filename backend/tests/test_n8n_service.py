@@ -93,3 +93,65 @@ class TestPayloadStructure:
                     message="Hello",
                     history=[],
                 )
+
+
+class TestParseResponse:
+    def setup_method(self):
+        self.service = N8nService()
+
+    def test_plain_text_reply(self):
+        result = self.service._parse_response({"reply": "Hello there!"})
+        assert result["reply"] == "Hello there!"
+
+    def test_output_field_fallback(self):
+        result = self.service._parse_response({"output": "Response from output"})
+        assert result["reply"] == "Response from output"
+
+    def test_content_field_fallback(self):
+        result = self.service._parse_response({"content": "Response from content"})
+        assert result["reply"] == "Response from content"
+
+    def test_literal_backslash_n_restored(self):
+        result = self.service._parse_response({"reply": "Line 1\\nLine 2\\nLine 3"})
+        assert result["reply"] == "Line 1\nLine 2\nLine 3"
+
+    def test_real_newlines_preserved(self):
+        result = self.service._parse_response({"reply": "Line 1\nLine 2\nLine 3"})
+        assert result["reply"] == "Line 1\nLine 2\nLine 3"
+
+    def test_double_encoded_json_string_unwrapped(self):
+        import json
+        inner = "This is the real reply"
+        double_encoded = json.dumps(inner)
+        result = self.service._parse_response({"reply": double_encoded})
+        assert result["reply"] == inner
+
+    def test_json_object_string_unwrapped(self):
+        import json
+        inner = {"reply": "Nested reply text"}
+        result = self.service._parse_response({"reply": json.dumps(inner)})
+        assert result["reply"] == "Nested reply text"
+
+    def test_list_response_uses_first_element(self):
+        result = self.service._parse_response([{"reply": "First item reply"}])
+        assert result["reply"] == "First item reply"
+
+    def test_empty_reply_returns_default(self):
+        result = self.service._parse_response({"reply": ""})
+        assert result["reply"] == "No response received."
+
+    def test_media_url_extracted(self):
+        result = self.service._parse_response({"reply": "See image", "media_url": "https://example.com/img.png"})
+        assert result["media_url"] == "https://example.com/img.png"
+
+    def test_image_url_field_fallback(self):
+        result = self.service._parse_response({"reply": "See image", "image_url": "https://example.com/img.png"})
+        assert result["media_url"] == "https://example.com/img.png"
+
+    def test_strips_leading_trailing_whitespace(self):
+        result = self.service._parse_response({"reply": "  Hello world  "})
+        assert result["reply"] == "Hello world"
+
+    def test_non_dict_data_returns_stringified(self):
+        result = self.service._parse_response("just a string")
+        assert result["reply"] == "just a string"
