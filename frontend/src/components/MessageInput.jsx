@@ -198,8 +198,8 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
   const hasContent = text.trim() || file;
 
   return (
-    <div className="px-4 pb-6 pt-2 flex-shrink-0">
-      <div className="max-w-3xl mx-auto">
+    <div className="px-3 sm:px-4 md:px-6 pb-4 sm:pb-6 pt-2 flex-shrink-0">
+      <div className="w-full max-w-3xl mx-auto">
         <div
           className="relative rounded-2xl shadow-sm bg-white border-[1.5px] border-[#e5e7eb]"
           onDragOver={(e) => e.preventDefault()}

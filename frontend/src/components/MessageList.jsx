@@ -43,7 +43,7 @@ function Message({ msg }) {
     <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
       {!isUser && <PreddiAvatar />}
 
-      <div className={`max-w-[75%] flex flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
+      <div className={`max-w-[88%] sm:max-w-[78%] md:max-w-[72%] flex flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
         {msg.skill && <SkillBadge skill={msg.skill} />}
         <div className={bubbleCls}>
           {isUser ? (
@@ -123,8 +123,8 @@ export default function MessageList({ messages, isTyping }) {
   }, [messages, isTyping]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-6 scrollbar-thin">
-      <div className="max-w-3xl mx-auto flex flex-col gap-4">
+    <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 scrollbar-thin">
+      <div className="w-full max-w-3xl mx-auto flex flex-col gap-3 sm:gap-4">
         {messages.length === 0 && !isTyping && (
           <div className="flex flex-col items-center justify-center h-64 text-center">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bg-[#308AD8]/10">

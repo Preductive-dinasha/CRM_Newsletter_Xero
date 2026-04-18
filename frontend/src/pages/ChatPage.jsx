@@ -7,6 +7,7 @@ import { sendMessage } from "../api/chat";
 import { createSession } from "../api/sessions";
 
 const AGENT_LS_KEY = "preddi_last_agent";
+const MOBILE_BREAKPOINT = 768;
 
 const AGENT_COLORS = {
   CRM: { dot: "bg-amber-500", badge: "bg-amber-500/10 text-amber-600 border border-amber-500/25" },
@@ -35,13 +36,18 @@ function HamburgerIcon() {
   );
 }
 
+function isMobileViewport() {
+  return typeof window !== "undefined" && window.innerWidth < MOBILE_BREAKPOINT;
+}
+
 export default function ChatPage() {
   const [sessions, setSessions] = useState([]);
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [sessionTitle, setSessionTitle] = useState("New Chat");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(isMobileViewport());
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobileViewport());
   const [skills, setSkills] = useState([]);
 
   const defaultAgent = "CRM";
@@ -51,6 +57,17 @@ export default function ChatPage() {
     : defaultAgent;
   const validatedAgent = ALLOWED_AGENTS.includes(savedAgent) ? savedAgent : defaultAgent;
   const [agent, setAgent] = useState(validatedAgent);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = isMobileViewport();
+      setIsMobile(mobile);
+      if (mobile) setSidebarOpen(false);
+      else setSidebarOpen(true);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleAgentChange = useCallback((a) => {
     setAgent(a);
@@ -82,11 +99,13 @@ export default function ChatPage() {
 
   const handleSessionSelect = useCallback((sessionId) => {
     setActiveSessionId(sessionId);
+    if (isMobileViewport()) setSidebarOpen(false);
   }, []);
 
   const handleNewSession = useCallback((sessionId) => {
     setActiveSessionId(sessionId);
     setMessages([]);
+    if (isMobileViewport()) setSidebarOpen(false);
   }, []);
 
   const handleSend = useCallback(async ({ message, skill, file }) => {
@@ -170,20 +189,34 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#F9F9F9]">
-      <div className={`flex-shrink-0 transition-all duration-300 ${sidebarOpen ? "w-64" : "w-0 overflow-hidden"}`}>
-        {sidebarOpen && (
-          <Sidebar
-            activeSessionId={activeSessionId}
-            onSessionSelect={handleSessionSelect}
-            onNewSession={handleNewSession}
-            sessions={sessions}
-            setSessions={setSessions}
-          />
-        )}
+
+      {isMobile && sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <div
+        className={`
+          flex-shrink-0 transition-all duration-300
+          ${isMobile
+            ? `fixed inset-y-0 left-0 z-50 w-64 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`
+            : sidebarOpen ? "w-64" : "w-0 overflow-hidden"
+          }
+        `}
+      >
+        <Sidebar
+          activeSessionId={activeSessionId}
+          onSessionSelect={handleSessionSelect}
+          onNewSession={handleNewSession}
+          sessions={sessions}
+          setSessions={setSessions}
+        />
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="flex-shrink-0 flex items-center gap-3 px-4 py-3 border-b border-gray-200 bg-white">
+      <div className="chat-container flex flex-col min-w-0">
+        <header className="flex-shrink-0 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 border-b border-gray-200 bg-white">
           <button
             onClick={() => setSidebarOpen((v) => !v)}
             className="p-2 rounded-lg transition-all text-gray-400 hover:bg-gray-100 hover:text-[#0A222C] flex-shrink-0"
@@ -192,7 +225,7 @@ export default function ChatPage() {
             <HamburgerIcon />
           </button>
 
-          <h1 className="font-semibold text-base truncate flex-1 text-[#0A222C]">
+          <h1 className="font-semibold text-sm sm:text-base truncate flex-1 text-[#0A222C]">
             {sessionTitle}
           </h1>
 
