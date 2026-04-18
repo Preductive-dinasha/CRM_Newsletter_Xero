@@ -146,6 +146,8 @@ class N8nService:
         if isinstance(reply, str):
             reply = reply.replace("\\n", "\n")
             reply = self._normalise_spacing(reply)
+            reply = re.sub(r'(?<!\n)(\d+\. )', r'\n\1', reply)
+            reply = re.sub(r'(?<!\n)(– )', r'\n\1', reply)
 
         reply = str(reply).strip() if reply else ""
 
