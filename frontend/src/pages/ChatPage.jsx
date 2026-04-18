@@ -154,7 +154,6 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, errMsg]);
     } finally {
       setIsTyping(false);
-      if (filePreview) URL.revokeObjectURL(filePreview);
     }
   }, [activeSessionId, agent]);
 

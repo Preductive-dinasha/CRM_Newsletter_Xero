@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import SkillSelector, { SkillChip } from "./SkillSelector";
+import SkillSelector from "./SkillSelector";
 import useSpeech from "../hooks/useSpeech";
 
 function AgentDropdown({ agent, onSelect, skills }) {
@@ -20,7 +20,6 @@ function AgentDropdown({ agent, onSelect, skills }) {
   }, []);
 
   const options = skills && skills.length > 0 ? skills : ["CRM", "Newsletter", "Xero"];
-  const isAgent = true;
 
   return (
     <div ref={ref} className="relative flex-shrink-0">
