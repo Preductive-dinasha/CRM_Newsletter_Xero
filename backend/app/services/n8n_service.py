@@ -95,13 +95,10 @@ class N8nService:
         text = re.sub(r"  +", "\n", text)
         return text
 
-    def _parse_response(self, data: dict | list) -> dict:
-        if isinstance(data, list) and len(data) > 0:
-            data = data[0]
+    def _parse_response(self, data: dict) -> dict:
+        import re, json
 
-        if not isinstance(data, dict):
-            return {"reply": str(data).strip(), "media_url": None}
-
+        # Step 1: Extract reply from whichever field n8n returns
         reply = (
             data.get("reply")
             or data.get("output")
@@ -112,48 +109,29 @@ class N8nService:
             or ""
         )
 
-        if isinstance(reply, dict):
-            reply = reply.get("reply") or reply.get("output") or reply.get("text") or str(reply)
+        # Step 2: Unwrap double-encoded JSON string
+        if isinstance(reply, str) and reply.startswith('"') and reply.endswith('"'):
+            try:
+                reply = json.loads(reply)
+            except Exception:
+                pass
 
-        if isinstance(reply, str):
-            stripped = reply.strip()
-            if stripped.startswith('"') and stripped.endswith('"'):
-                try:
-                    reply = json.loads(stripped)
-                except (json.JSONDecodeError, TypeError):
-                    pass
-            elif stripped.startswith("{") or stripped.startswith("["):
-                try:
-                    inner = json.loads(stripped)
-                    if isinstance(inner, dict):
-                        reply = (
-                            inner.get("reply")
-                            or inner.get("output")
-                            or inner.get("text")
-                            or reply
-                        )
-                    elif isinstance(inner, list) and len(inner) > 0 and isinstance(inner[0], dict):
-                        first = inner[0]
-                        reply = (
-                            first.get("reply")
-                            or first.get("output")
-                            or first.get("text")
-                            or reply
-                        )
-                except (json.JSONDecodeError, TypeError):
-                    pass
+        # Step 3: Restore real newlines from escaped \n
+        reply = reply.replace("\\n", "\n")
 
-        if isinstance(reply, str):
-            reply = reply.replace("\\n", "\n")
-            reply = self._normalise_spacing(reply)
-            reply = re.sub(r'(?<!\n)(\d+\. )', r'\n\1', reply)
-            reply = re.sub(r'(?<!\n)(– )', r'\n\1', reply)
+        # Step 4: Add newline before numbered list items (1. 2. 3. etc)
+        reply = re.sub(r'(?<!\n)(\s*)(\d+[\.\)]\s)', r'\n\2', reply)
 
-        reply = str(reply).strip() if reply else ""
+        # Step 5: Add newline before dash-separated entries (– ID or - Item)
+        reply = re.sub(r'(?<!\n)\s+(–|-)\s+(?=\w)', r'\n– ', reply)
 
-        media_url = data.get("media_url") or data.get("image_url")
+        # Step 6: "Reply with" always on its own paragraph
+        reply = re.sub(r'\s*(Reply with\b)', r'\n\n\1', reply)
 
-        return {
-            "reply": reply or "No response received.",
-            "media_url": media_url,
-        }
+        # Step 7: Clean up more than 2 consecutive newlines
+        reply = re.sub(r'\n{3,}', '\n\n', reply)
+
+        # Step 8: Strip leading/trailing whitespace
+        reply = reply.strip()
+
+        return {"reply": reply}

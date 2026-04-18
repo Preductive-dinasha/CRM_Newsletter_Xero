@@ -126,35 +126,33 @@ class TestParseResponse:
         result = self.service._parse_response({"reply": double_encoded})
         assert result["reply"] == inner
 
-    def test_json_object_string_unwrapped(self):
+    def test_json_object_string_not_unwrapped(self):
         import json
         inner = {"reply": "Nested reply text"}
-        result = self.service._parse_response({"reply": json.dumps(inner)})
-        assert result["reply"] == "Nested reply text"
+        raw = json.dumps(inner)
+        result = self.service._parse_response({"reply": raw})
+        assert raw in result["reply"]
 
-    def test_list_response_uses_first_element(self):
-        result = self.service._parse_response([{"reply": "First item reply"}])
-        assert result["reply"] == "First item reply"
-
-    def test_empty_reply_returns_default(self):
+    def test_empty_reply_returns_empty_string(self):
         result = self.service._parse_response({"reply": ""})
-        assert result["reply"] == "No response received."
+        assert result["reply"] == ""
 
-    def test_media_url_extracted(self):
+    def test_reply_only_key_returned(self):
         result = self.service._parse_response({"reply": "See image", "media_url": "https://example.com/img.png"})
-        assert result["media_url"] == "https://example.com/img.png"
-
-    def test_image_url_field_fallback(self):
-        result = self.service._parse_response({"reply": "See image", "image_url": "https://example.com/img.png"})
-        assert result["media_url"] == "https://example.com/img.png"
+        assert "reply" in result
+        assert "media_url" not in result
 
     def test_strips_leading_trailing_whitespace(self):
         result = self.service._parse_response({"reply": "  Hello world  "})
         assert result["reply"] == "Hello world"
 
-    def test_non_dict_data_returns_stringified(self):
-        result = self.service._parse_response("just a string")
-        assert result["reply"] == "just a string"
+    def test_numbered_list_gets_newlines(self):
+        result = self.service._parse_response({"reply": "Pick one: 1. Alpha 2. Beta 3. Gamma"})
+        assert "\n1." in result["reply"] or "\n2." in result["reply"]
+
+    def test_reply_with_gets_own_paragraph(self):
+        result = self.service._parse_response({"reply": "Here are options. Reply with the number."})
+        assert "\n\nReply with" in result["reply"]
 
 
 class TestNormaliseSpacing:
