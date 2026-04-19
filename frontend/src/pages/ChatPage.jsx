@@ -10,17 +10,16 @@ const AGENT_LS_KEY = "preddi_last_agent";
 const MOBILE_BREAKPOINT = 768;
 
 const AGENT_COLORS = {
-  CRM: { dot: "bg-amber-500", badge: "bg-amber-500/10 text-amber-600 border border-amber-500/25" },
-  Newsletter: { dot: "bg-blue-500", badge: "bg-blue-500/10 text-blue-600 border border-blue-500/25" },
-  Xero: { dot: "bg-green-500", badge: "bg-green-500/10 text-green-600 border border-green-500/25" },
+  CRM: { dot: "bg-orange-500", badge: "bg-orange-500 text-white" },
+  Newsletter: { dot: "bg-blue-500", badge: "bg-blue-500 text-white" },
+  Xero: { dot: "bg-green-500", badge: "bg-green-500 text-white" },
 };
 
 function AgentBadge({ agent }) {
   if (!agent) return null;
   const c = AGENT_COLORS[agent] || { dot: "bg-[#308AD8]", badge: "bg-[#308AD8]/10 text-[#308AD8] border border-[#308AD8]/25" };
   return (
-    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${c.badge}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} />
+    <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold tracking-wide ${c.badge}`}>
       @{agent}
     </span>
   );
@@ -188,7 +187,7 @@ export default function ChatPage() {
   }, [activeSessionId, agent]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F9F9F9]">
+    <div className="flex h-screen overflow-hidden bg-[#F0F2F5]">
 
       {isMobile && sidebarOpen && (
         <div
@@ -201,8 +200,8 @@ export default function ChatPage() {
         className={`
           flex-shrink-0 transition-all duration-300
           ${isMobile
-            ? `fixed inset-y-0 left-0 z-50 w-64 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`
-            : sidebarOpen ? "w-64" : "w-0 overflow-hidden"
+            ? `fixed inset-y-0 left-0 z-50 w-[300px] ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`
+            : sidebarOpen ? "w-[300px]" : "w-0 overflow-hidden"
           }
         `}
       >
@@ -216,7 +215,7 @@ export default function ChatPage() {
       </div>
 
       <div className="chat-container flex flex-col min-w-0">
-        <header className="flex-shrink-0 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 border-b border-gray-200 bg-white">
+        <header className="flex-shrink-0 flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-4 bg-white shadow-sm">
           <button
             onClick={() => setSidebarOpen((v) => !v)}
             className="p-2 rounded-lg transition-all text-gray-400 hover:bg-gray-100 hover:text-[#0A222C] flex-shrink-0"

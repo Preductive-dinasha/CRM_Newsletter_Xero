@@ -56,8 +56,8 @@ function SessionItem({ session, active, onSelect, onDelete }) {
 
   return (
     <div
-      className={`group relative flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-all text-sm ${
-        active ? "bg-white/12 text-white" : "text-white/75 hover:bg-white/6"
+      className={`group relative flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-all text-sm font-medium ${
+        active ? "bg-white/10 text-white" : "text-white/65 hover:bg-white/6 hover:text-white"
       }`}
       onClick={() => onSelect(session.session_id)}
       onMouseLeave={() => setConfirming(false)}
@@ -115,34 +115,34 @@ export default function Sidebar({ activeSessionId, onSessionSelect, onNewSession
   const displayName = user ? user.f_name || user.email : "";
 
   return (
-    <aside className="flex flex-col h-full w-full bg-[#0A1929] border-r border-white/8">
-      <div className="p-4 flex-shrink-0">
-        <div className="flex items-center gap-2 mb-4 px-1">
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 bg-[#308AD8]">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <aside className="flex flex-col h-full w-full bg-[#0D1117] border-r border-white/6">
+      <div className="px-5 pt-5 pb-4 flex-shrink-0">
+        <div className="flex items-center gap-2.5 mb-5">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 bg-[#308AD8]">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
           </div>
-          <span className="font-bold text-white text-base tracking-tight">Preddi</span>
+          <span className="font-bold text-white text-lg tracking-tight">Preddi</span>
         </div>
 
         <button
           onClick={handleNew}
           disabled={creating}
-          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all text-[#308AD8] bg-[#308AD8]/15 border border-[#308AD8]/25 hover:bg-[#308AD8]/25 disabled:opacity-60"
+          className="w-full flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all text-white bg-[#1C3557] hover:bg-[#234270] disabled:opacity-60"
         >
           <PlusIcon />
           {creating ? "Creating…" : "New Chat"}
         </button>
       </div>
 
-      <div className="px-4 pb-2 flex-shrink-0">
-        <p className="text-xs font-medium px-1 mb-1 text-white/30">Recent</p>
+      <div className="px-5 pb-2 flex-shrink-0">
+        <p className="text-xs font-semibold px-1 mb-1 uppercase tracking-wider text-white/25">Recent</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto px-3 scrollbar-thin">
         {sessions.length === 0 ? (
-          <p className="text-xs text-center py-4 text-white/30">No conversations yet</p>
+          <p className="text-xs text-center py-6 text-white/25">No conversations yet</p>
         ) : (
           sessions.map((s) => (
             <SessionItem
@@ -156,16 +156,19 @@ export default function Sidebar({ activeSessionId, onSessionSelect, onNewSession
         )}
       </div>
 
-      <div className="p-4 flex-shrink-0 border-t border-white/8">
+      <div className="px-5 py-4 flex-shrink-0 border-t border-white/6">
         <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 bg-[#308AD8]">
+            {initials}
+          </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate text-white">{displayName}</p>
-            <p className="text-xs truncate text-white/40">{user?.email}</p>
+            <p className="text-sm font-semibold truncate text-white">{displayName}</p>
+            <p className="text-xs truncate text-white/35">{user?.email}</p>
           </div>
           <button
             onClick={logout}
             title="Sign out"
-            className="p-1.5 rounded-lg transition-all text-white/40 hover:text-white hover:bg-white/8"
+            className="p-1.5 rounded-lg transition-all text-white/35 hover:text-white hover:bg-white/8"
           >
             <SignOutIcon />
           </button>

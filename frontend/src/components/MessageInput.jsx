@@ -26,7 +26,7 @@ function AgentDropdown({ agent, onSelect, skills }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all bg-[#308AD8]/10 text-[#308AD8] border border-[#308AD8]/25 hover:bg-[#308AD8]/20"
+        className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-orange-500 text-white hover:bg-orange-600"
         title="Select agent"
       >
         @{agent}
@@ -198,10 +198,10 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
   const hasContent = text.trim() || file;
 
   return (
-    <div className="px-3 sm:px-4 md:px-6 pb-4 sm:pb-6 pt-2 flex-shrink-0">
-      <div className="w-full max-w-3xl mx-auto">
+    <div className="px-4 sm:px-6 md:px-8 pb-5 sm:pb-7 pt-3 flex-shrink-0 bg-[#F0F2F5]">
+      <div className="w-full max-w-3xl mx-auto relative">
         <div
-          className="relative rounded-2xl shadow-sm bg-white border-[1.5px] border-[#e5e7eb]"
+          className="relative rounded-2xl shadow-md bg-white border border-gray-200/80"
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
@@ -288,10 +288,18 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
             </button>
           </div>
         </div>
-        <p className="text-center text-xs mt-2 text-gray-300">
+        <p className="text-center text-xs mt-2 text-gray-400/70">
           Enter to send · Shift+Enter for new line · @ to pick a skill
         </p>
       </div>
+
+      <button
+        type="button"
+        className="fixed bottom-6 right-6 w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg bg-[#1a2332] hover:bg-[#243345] transition-all z-40"
+        title="Help"
+      >
+        ?
+      </button>
     </div>
   );
 }

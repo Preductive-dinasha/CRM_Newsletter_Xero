@@ -123,17 +123,17 @@ export default function MessageList({ messages, isTyping }) {
   }, [messages, isTyping]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 scrollbar-thin">
+    <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 scrollbar-thin bg-[#F0F2F5]">
       <div className="w-full max-w-3xl mx-auto flex flex-col gap-3 sm:gap-4">
         {messages.length === 0 && !isTyping && (
-          <div className="flex flex-col items-center justify-center h-64 text-center">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bg-[#308AD8]/10">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#308AD8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex flex-col items-center justify-center h-72 text-center">
+            <div className="w-20 h-20 rounded-[22px] flex items-center justify-center mb-6 bg-[#EEF2FF] shadow-sm">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#308AD8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-lg text-[#0A222C]">How can I help you?</h3>
-            <p className="text-sm mt-1 text-gray-400">Select an agent below, then type your message</p>
+            <h3 className="font-bold text-2xl text-[#0A222C] mb-2">How can I help you?</h3>
+            <p className="text-sm text-gray-400">Select an agent below, then type your message</p>
           </div>
         )}
 
