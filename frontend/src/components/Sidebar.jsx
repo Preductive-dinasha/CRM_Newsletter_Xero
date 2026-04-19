@@ -158,9 +158,6 @@ export default function Sidebar({ activeSessionId, onSessionSelect, onNewSession
 
       <div className="p-4 flex-shrink-0 border-t border-white/8">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 bg-[#1e3a5f]">
-            {initials}
-          </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate text-white">{displayName}</p>
             <p className="text-xs truncate text-white/40">{user?.email}</p>
