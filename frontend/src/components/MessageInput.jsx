@@ -293,13 +293,6 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
         </p>
       </div>
 
-      <button
-        type="button"
-        className="fixed bottom-6 right-6 w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg bg-[#1a2332] hover:bg-[#243345] transition-all z-40"
-        title="Help"
-      >
-        ?
-      </button>
     </div>
   );
 }
