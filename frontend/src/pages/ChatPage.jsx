@@ -187,7 +187,7 @@ export default function ChatPage() {
   }, [activeSessionId, agent]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#F0F2F5]">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
 
       {isMobile && sidebarOpen && (
         <div
@@ -215,7 +215,7 @@ export default function ChatPage() {
       </div>
 
       <div className="chat-container flex flex-col min-w-0">
-        <header className="flex-shrink-0 flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-4 bg-white shadow-sm">
+        <header className="flex-shrink-0 flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-4 bg-white border-b border-gray-200">
           <button
             onClick={() => setSidebarOpen((v) => !v)}
             className="p-2 rounded-lg transition-all text-gray-400 hover:bg-gray-100 hover:text-[#0A222C] flex-shrink-0"

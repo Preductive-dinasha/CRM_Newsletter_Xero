@@ -198,10 +198,10 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
   const hasContent = text.trim() || file;
 
   return (
-    <div className="px-4 sm:px-6 md:px-8 pb-8 sm:pb-10 pt-5 flex-shrink-0 bg-[#F0F2F5] border-t border-[#e5e7eb]">
+    <div className="px-4 sm:px-6 md:px-8 pb-8 sm:pb-10 pt-5 flex-shrink-0 bg-white border-t border-gray-200">
       <div className="w-full max-w-3xl mx-auto relative">
         <div
-          className="relative rounded-2xl shadow-md bg-white border border-gray-200/80"
+          className="relative rounded-lg shadow-sm bg-white border border-gray-300 focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100 transition-all"
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
