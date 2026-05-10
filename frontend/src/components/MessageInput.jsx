@@ -26,7 +26,7 @@ function AgentDropdown({ agent, onSelect, skills }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold transition-all bg-orange-500 text-white hover:bg-orange-600"
+        className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-medium transition duration-150 ease-out bg-[#F4F4F5] text-[#18181B] border border-[#E4E4E7] hover:bg-[#F8F8F8]"
         title="Select agent"
       >
         @{agent}
@@ -36,14 +36,14 @@ function AgentDropdown({ agent, onSelect, skills }) {
       </button>
 
       {open && (
-        <div className="absolute bottom-full mb-1.5 left-0 z-50 rounded-xl shadow-lg border border-[#e5e7eb] bg-white overflow-hidden min-w-36">
+        <div className="absolute bottom-full mb-1.5 left-0 z-50 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.08)] border border-[#E4E4E7] bg-white overflow-hidden min-w-36">
           <div className="py-1">
             {options.map((opt) => (
               <button
                 key={opt}
                 type="button"
-                className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${
-                  opt === agent ? "bg-[#308AD8]/10 text-[#308AD8] font-medium" : "text-[#0A222C] hover:bg-gray-50"
+                className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left transition duration-150 ease-out ${
+                  opt === agent ? "bg-[#F4F4F5] text-[#18181B] font-medium" : "text-[#09090B] hover:bg-[#F4F4F5]"
                 }`}
                 onClick={() => { onSelect(opt); setOpen(false); }}
               >
@@ -76,11 +76,11 @@ function FilePreview({ file, onRemove }) {
   if (thumb) {
     return (
       <div className="relative inline-flex">
-        <img src={thumb} alt="attachment preview" className="h-12 w-12 rounded-lg object-cover border-[1.5px] border-[#e5e7eb]" />
+        <img src={thumb} alt="attachment preview" className="h-12 w-12 rounded-lg object-cover border-[1.5px] border-[#E4E4E7]" />
         <button
           type="button"
           onClick={onRemove}
-          className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center text-white text-xs leading-none bg-gray-500 hover:bg-gray-700"
+          className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center text-white text-xs leading-none bg-[#71717A] hover:bg-[#18181B]"
         >
           ×
         </button>
@@ -89,13 +89,15 @@ function FilePreview({ file, onRemove }) {
   }
 
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-700 border border-[#e5e7eb]">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-[#F4F4F5] text-[#71717A] border border-[#E4E4E7]">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
         <polyline points="14 2 14 8 20 8" />
       </svg>
       {file.name}
-      <button type="button" onClick={onRemove} className="hover:opacity-70">×</button>
+      <button type="button" onClick={onRemove} className="hover:opacity-70 transition-opacity leading-none">
+        ×
+      </button>
     </span>
   );
 }
@@ -198,10 +200,10 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
   const hasContent = text.trim() || file;
 
   return (
-    <div className="px-4 sm:px-6 md:px-8 pb-8 sm:pb-10 pt-5 flex-shrink-0 bg-white border-t border-gray-200">
-      <div className="w-full max-w-3xl mx-auto relative">
+    <div className="px-4 sm:px-6 md:px-8 pb-6 sm:pb-8 pt-4 flex-shrink-0 bg-[#F8F8F8] border-t border-[#EBEBEB]">
+      <div className="w-full relative">
         <div
-          className="relative rounded-lg shadow-sm bg-white border border-gray-300 focus-within:border-gray-400 focus-within:ring-2 focus-within:ring-gray-100 transition-all"
+          className="relative rounded-[16px] shadow-[0_1px_3px_rgba(0,0,0,0.04)] bg-white border border-[#E4E4E7]"
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
@@ -227,7 +229,7 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
             placeholder="Message Preddi… (@ to pick a skill)"
             disabled={disabled}
             rows={1}
-            className="w-full resize-none bg-transparent px-4 py-4 text-sm outline-none disabled:opacity-50 text-[#0A222C] leading-relaxed overflow-auto max-h-[200px]"
+            className="w-full resize-none bg-transparent px-4 py-4 text-[14px] outline-none disabled:opacity-50 text-[#09090B] leading-relaxed overflow-auto max-h-[200px]"
             onInput={(e) => {
               e.target.style.height = "auto";
               e.target.style.height = Math.min(e.target.scrollHeight, 200) + "px";
@@ -239,7 +241,7 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
-                className="p-2 rounded-lg transition-all text-gray-400 hover:text-[#308AD8] hover:bg-[#308AD8]/8"
+                className="p-2 rounded-lg transition duration-150 ease-out text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5]"
                 title="Attach file"
               >
                 <AttachIcon />
@@ -256,22 +258,22 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
                 type="button"
                 onClick={speech.toggle}
                 disabled={!speech.supported}
-                className={`relative p-2 rounded-lg transition-all disabled:opacity-40 ${
+                className={`relative p-2 rounded-lg transition duration-150 ease-out disabled:opacity-40 ${
                   speech.listening
-                    ? "text-[#308AD8] bg-[#308AD8]/8"
-                    : "text-gray-400 hover:text-[#308AD8] hover:bg-[#308AD8]/8"
+                    ? "text-[#18181B] bg-[#F4F4F5]"
+                    : "text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5]"
                 }`}
                 title={!speech.supported ? "Voice input not supported" : speech.listening ? "Stop recording" : "Voice input"}
               >
                 {speech.listening && (
-                  <span className="absolute inset-0 rounded-lg animate-mic-pulse bg-[#308AD8]/15 pointer-events-none" />
+                  <span className="absolute inset-0 rounded-lg animate-mic-pulse bg-black/15 pointer-events-none" />
                 )}
                 <span className="relative">
                   <MicIcon filled={speech.listening} />
                 </span>
               </button>
 
-              <span className="text-gray-200 text-xs">|</span>
+              <span className="text-[#D4D4D8] text-xs">|</span>
 
               <AgentDropdown agent={agent || "General"} onSelect={onAgentChange || (() => {})} skills={skills} />
             </div>
@@ -280,15 +282,15 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
               type="button"
               onClick={handleSend}
               disabled={disabled || !hasContent}
-              className={`p-2 rounded-xl transition-all disabled:opacity-40 ${
-                hasContent && !disabled ? "bg-[#308AD8] text-white hover:bg-[#2677c4]" : "bg-gray-200 text-gray-400"
+              className={`h-8 w-8 rounded-full transition duration-150 ease-out disabled:opacity-30 ${
+                hasContent && !disabled ? "bg-[#18181B] text-white hover:bg-[#0f0f10] active:scale-[0.98]" : "bg-gray-200 text-gray-400"
               }`}
             >
               <SendIcon />
             </button>
           </div>
         </div>
-        <p className="text-center text-xs mt-4 text-gray-400/70">
+        <p className="text-center text-xs mt-3 text-[#71717A]">
           Enter to send · Shift+Enter for new line · @ to pick a skill
         </p>
       </div>

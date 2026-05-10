@@ -8,7 +8,7 @@ from urllib.parse import urlparse, quote
 import requests
 import markdown
 import bleach
-from flask import Flask, render_template, request, jsonify, session, Response
+from flask import Flask, abort, send_file, send_from_directory, request, jsonify, session, Response
 from werkzeug.utils import secure_filename
 
 logging.basicConfig(level=logging.DEBUG)
@@ -227,9 +227,25 @@ def parse_n8n_response(response_data):
     return {"text": render_markdown_safe(text), "raw_text": text, "media": media}
 
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+frontend_dist = os.path.abspath(os.path.join(os.path.dirname(__file__), "frontend", "dist"))
+
+
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def index(path):
+    if path.startswith("api"):
+        abort(404)
+
+    if os.path.isdir(frontend_dist):
+        target = os.path.join(frontend_dist, path)
+        if path and os.path.isfile(target):
+            return send_from_directory(frontend_dist, path)
+        return send_from_directory(frontend_dist, "index.html")
+
+    frontend_index = os.path.join(os.path.dirname(__file__), "frontend", "index.html")
+    if os.path.exists(frontend_index):
+        return send_file(frontend_index)
+    return Response("Frontend files not found. Please build or restore frontend files.", status=404)
 
 
 @app.route("/api/session", methods=["GET"])
@@ -407,4 +423,6 @@ def health():
 if __name__ == "__main__":
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     debug = os.environ.get("FLASK_DEBUG", "true").lower() == "true"
-    app.run(host="0.0.0.0", port=5000, debug=debug)
+    host = os.environ.get("HOST", "127.0.0.1")
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host=host, port=port, debug=debug)

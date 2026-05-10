@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 
 const SKILL_COLORS = {
-  CRM: "bg-amber-500/10 text-amber-700 border border-amber-500/25",
-  Newsletter: "bg-blue-500/10 text-blue-700 border border-blue-500/25",
-  Xero: "bg-green-500/10 text-green-700 border border-green-500/25",
+  CRM: "bg-[#F4F4F5] text-[#18181B] border border-[#E4E4E7]",
+  Newsletter: "bg-[#F4F4F5] text-[#18181B] border border-[#E4E4E7]",
+  Xero: "bg-[#F4F4F5] text-[#18181B] border border-[#E4E4E7]",
 };
 
 function getSkillCls(skill) {
-  return SKILL_COLORS[skill] || "bg-gray-100 text-gray-700 border border-gray-200";
+  return SKILL_COLORS[skill] || "bg-[#F4F4F5] text-[#18181B] border border-[#E4E4E7]";
 }
 
 export function SkillChip({ skill, onRemove }) {
@@ -32,7 +32,7 @@ export function SkillChip({ skill, onRemove }) {
 export function SkillBadge({ skill }) {
   const cls = getSkillCls(skill);
   return (
-    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${cls}`}>
+    <span className={`inline-flex items-center px-2 py-1 rounded-full text-[12px] font-medium ${cls}`}>
       @{skill}
     </span>
   );
@@ -80,10 +80,10 @@ export default function SkillSelector({ query, onSelect, onClose, skills }) {
   return (
     <div
       ref={ref}
-      className="rounded-xl shadow-lg border border-[#e5e7eb] bg-white overflow-hidden min-w-40"
+      className="rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.08)] border border-[#E4E4E7] bg-white overflow-hidden min-w-40"
     >
-      <div className="px-3 py-2 border-b border-[#e5e7eb]">
-        <p className="text-xs font-medium text-gray-400">Skills</p>
+      <div className="px-3 py-2 border-b border-[#E4E4E7]">
+        <p className="text-xs font-medium text-[#71717A]">Skills</p>
       </div>
       <div className="py-1">
         {filtered.map((skill, i) => {
@@ -92,8 +92,8 @@ export default function SkillSelector({ query, onSelect, onClose, skills }) {
             <button
               key={skill}
               type="button"
-              className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${
-                isHi ? "bg-[#308AD8]/8 text-[#308AD8]" : "text-[#0A222C] hover:bg-gray-50"
+              className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left transition duration-150 ease-out ${
+                isHi ? "bg-[#F4F4F5] text-[#18181B]" : "text-[#09090B] hover:bg-[#F4F4F5]"
               }`}
               onMouseEnter={() => setHighlighted(i)}
               onClick={() => onSelect(skill)}

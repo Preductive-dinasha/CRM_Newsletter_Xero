@@ -11,10 +11,10 @@ const RULES = [
 ];
 
 function strengthColor(passed) {
-  if (passed < 2) return "bg-red-500";
-  if (passed < 4) return "bg-amber-500";
-  if (passed < 5) return "bg-blue-500";
-  return "bg-green-500";
+  if (passed < 2) return "bg-gray-300";
+  if (passed < 4) return "bg-gray-400";
+  if (passed < 5) return "bg-gray-500";
+  return "bg-black";
 }
 
 function strengthLabel(passed) {
@@ -26,10 +26,10 @@ function strengthLabel(passed) {
 }
 
 function strengthLabelColor(passed) {
-  if (passed < 2) return "text-red-500";
-  if (passed < 4) return "text-amber-500";
-  if (passed < 5) return "text-blue-500";
-  return "text-green-500";
+  if (passed < 2) return "text-gray-500";
+  if (passed < 4) return "text-gray-600";
+  if (passed < 5) return "text-gray-700";
+  return "text-black";
 }
 
 function PasswordStrength({ password }) {
@@ -65,11 +65,13 @@ function PasswordStrength({ password }) {
   );
 }
 
-const inputCls = "w-full px-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#fafafa] text-sm text-[#0A222C] outline-none transition-all focus:border-[#308AD8] focus:shadow-[0_0_0_3px_rgba(48,138,216,0.1)]";
+const inputCls = "w-full px-4 py-3 rounded-[18px] border border-[#E4E4E7] bg-[#F8F8F8] text-sm text-[#111827] outline-none transition duration-150 ease-out focus:border-black focus:shadow-[0_0_0_3px_rgba(0,0,0,0.08)]";
 
 export default function SignupPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ f_name: "", l_name: "", email: "", password: "", confirm: "", company: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -115,19 +117,19 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8 bg-[#F9F9F9]">
+    <div className="min-h-screen flex items-center justify-center py-10 bg-[#F8F8F8]">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 bg-[#308AD8]">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-[22px] mb-4 bg-black">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-[#0A222C]">Create your account</h1>
+          <h1 className="text-2xl font-bold text-black">Create your account</h1>
           <p className="text-sm mt-1 text-gray-500">Join Preddi to get started</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <form onSubmit={handleSubmit} className="bg-white rounded-[28px] shadow-[0_24px_80px_rgba(15,23,42,0.08)] border border-[#E4E4E7] p-8">
           {error && (
             <div className="mb-4 p-3 rounded-lg text-sm bg-red-50 text-red-600 border border-red-200">
               {error}
@@ -136,7 +138,7 @@ export default function SignupPage() {
 
           <div className="flex gap-3 mb-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium mb-1.5 text-[#0A222C]">First name</label>
+              <label className="block text-sm font-medium mb-1.5 text-black">First name</label>
               <input
                 type="text"
                 value={form.f_name}
@@ -148,7 +150,7 @@ export default function SignupPage() {
               />
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium mb-1.5 text-[#0A222C]">Last name</label>
+              <label className="block text-sm font-medium mb-1.5 text-black">Last name</label>
               <input
                 type="text"
                 value={form.l_name}
@@ -162,7 +164,7 @@ export default function SignupPage() {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1.5 text-[#0A222C]">Email</label>
+            <label className="block text-sm font-medium mb-1.5 text-black">Email</label>
             <input
               type="email"
               value={form.email}
@@ -175,7 +177,7 @@ export default function SignupPage() {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1.5 text-[#0A222C]">
+            <label className="block text-sm font-medium mb-1.5 text-black">
               Company{" "}
               <span className="font-normal text-gray-400">(optional)</span>
             </label>
@@ -190,30 +192,70 @@ export default function SignupPage() {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1.5 text-[#0A222C]">Password</label>
-            <input
-              type="password"
-              value={form.password}
-              onChange={set("password")}
-              placeholder="••••••••"
-              required
-              autoComplete="new-password"
-              className={inputCls}
-            />
+            <label className="block text-sm font-medium mb-1.5 text-black">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={set("password")}
+                placeholder="••••••••"
+                required
+                autoComplete="new-password"
+                className={inputCls}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                title={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
             <PasswordStrength password={form.password} />
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-1.5 text-[#0A222C]">Confirm password</label>
-            <input
-              type="password"
-              value={form.confirm}
-              onChange={set("confirm")}
-              placeholder="••••••••"
-              required
-              autoComplete="new-password"
-              className={`${inputCls} ${form.confirm && form.confirm !== form.password ? "border-red-300" : ""}`}
-            />
+            <label className="block text-sm font-medium mb-1.5 text-black">Confirm password</label>
+            <div className="relative">
+              <input
+                type={showConfirm ? "text" : "password"}
+                value={form.confirm}
+                onChange={set("confirm")}
+                placeholder="••••••••"
+                required
+                autoComplete="new-password"
+                className={`${inputCls} ${form.confirm && form.confirm !== form.password ? "border-red-300" : ""}`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                title={showConfirm ? "Hide password" : "Show password"}
+              >
+                {showConfirm ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
             {form.confirm && form.confirm !== form.password && (
               <p className="text-xs mt-1 text-red-500">Passwords do not match</p>
             )}
@@ -222,7 +264,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl text-white text-sm font-semibold bg-[#308AD8] hover:bg-[#2677c4] transition-colors disabled:opacity-60"
+            className="w-full py-3 rounded-xl text-white text-sm font-semibold bg-black hover:bg-[#27272A] transition duration-150 ease-out disabled:opacity-60"
           >
             {loading ? "Creating account…" : "Create account"}
           </button>
@@ -232,7 +274,7 @@ export default function SignupPage() {
             <button
               type="button"
               onClick={() => navigate("/login")}
-              className="font-medium text-[#308AD8] hover:underline"
+              className="font-medium text-black hover:underline"
             >
               Sign in
             </button>

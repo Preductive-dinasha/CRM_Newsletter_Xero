@@ -17,12 +17,12 @@ function AppRoutes() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#F9F9F9]">
+      <div className="flex items-center justify-center h-screen bg-[#F7F7F7]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[#308AD8]">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-black text-white">
             <ChatIcon />
           </div>
-          <p className="text-sm text-gray-400">Loading Preddi…</p>
+          <p className="text-sm text-gray-500">Loading Preddi…</p>
         </div>
       </div>
     );

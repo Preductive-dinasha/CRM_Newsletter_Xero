@@ -5,7 +5,7 @@ import { SkillBadge } from "./SkillSelector";
 
 function PreddiAvatar() {
   return (
-    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 bg-[#308AD8]">
+    <div className="w-7 h-7 rounded-[6px] flex items-center justify-center flex-shrink-0 mt-0.5 bg-[#18181B]">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       </svg>
@@ -15,7 +15,7 @@ function PreddiAvatar() {
 
 function UserAvatar() {
   return (
-    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-bold text-white bg-[#0A222C]">
+    <div className="w-7 h-7 rounded-[6px] flex items-center justify-center flex-shrink-0 mt-0.5 text-xs font-medium text-white bg-[#18181B]">
       U
     </div>
   );
@@ -34,16 +34,16 @@ function Message({ msg }) {
   }, [msg.file_preview]);
 
   const bubbleCls = isUser
-    ? "px-4 py-3 rounded-2xl text-sm leading-relaxed bg-[#308AD8] text-white rounded-br-[4px]"
+    ? "px-4 py-3 text-sm leading-relaxed bg-[#18181B] text-white rounded-[14px] rounded-br-[4px]"
     : isError
-    ? "px-4 py-3 rounded-2xl text-sm leading-relaxed bg-red-50 text-red-600 border border-red-200 rounded-bl-[4px]"
-    : "px-4 py-3 rounded-2xl text-sm leading-relaxed bg-white text-[#0A222C] border border-[#e5e7eb] rounded-bl-[4px]";
+    ? "px-4 py-3 text-sm leading-relaxed bg-[#FEF2F2] text-red-700 border border-[#FECACA] rounded-[14px] rounded-bl-[4px]"
+    : "px-4 py-3 text-sm leading-relaxed bg-white text-[#09090B] border border-[#E4E4E7] rounded-[14px] rounded-bl-[4px]";
 
   return (
     <div className={`flex gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
       {!isUser && <PreddiAvatar />}
 
-      <div className={`max-w-[88%] sm:max-w-[78%] md:max-w-[72%] flex flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
+      <div className={`max-w-[95%] sm:max-w-[85%] md:max-w-[80%] flex flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
         {msg.skill && <SkillBadge skill={msg.skill} />}
         <div className={bubbleCls}>
           {isUser ? (
@@ -63,7 +63,7 @@ function Message({ msg }) {
                   href={msg.file_url || "#"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-white/20 border border-white/30 hover:bg-white/30 transition-colors no-underline"
+                  className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-[#E4E4E7] hover:bg-[#F4F4F5] transition duration-150 ease-out no-underline"
                   onClick={!msg.file_url ? (e) => e.preventDefault() : undefined}
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 opacity-80">
@@ -87,7 +87,7 @@ function Message({ msg }) {
             />
           )}
         </div>
-        <span className="text-xs text-gray-400">
+        <span className="text-[11px] text-[#A1A1AA] mt-1">
           {msg.created_at
             ? new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
             : ""}
@@ -103,11 +103,11 @@ function TypingIndicator() {
   return (
     <div className="flex gap-3 justify-start">
       <PreddiAvatar />
-      <div className="px-4 py-3 rounded-2xl rounded-bl-[4px] flex items-center gap-1 bg-white border border-[#e5e7eb]">
+      <div className="px-4 py-3 rounded-[14px] rounded-bl-[4px] flex items-center gap-1 bg-white border border-[#E4E4E7]">
         {["[animation-delay:0s]", "[animation-delay:0.2s]", "[animation-delay:0.4s]"].map((delayCls, i) => (
           <span
             key={i}
-            className={`w-2 h-2 rounded-full bg-[#308AD8] opacity-70 animate-typing ${delayCls}`}
+            className={`w-2 h-2 rounded-full bg-[#18181B] opacity-70 animate-typing ${delayCls}`}
           />
         ))}
       </div>
@@ -123,17 +123,17 @@ export default function MessageList({ messages, isTyping }) {
   }, [messages, isTyping]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 scrollbar-thin bg-gray-50">
-      <div className="w-full max-w-3xl mx-auto flex flex-col gap-3 sm:gap-4">
+    <div className="flex-1 overflow-y-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 scrollbar-thin bg-[#F8F8F8]">
+      <div className="w-full flex flex-col gap-4">
         {messages.length === 0 && !isTyping && (
           <div className="flex flex-col items-center justify-center h-72 text-center">
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 bg-gray-100">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <div className="w-20 h-20 rounded-lg flex items-center justify-center mb-6 bg-[#F4F4F5] shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-3xl text-gray-900 mb-2">How can I help you?</h3>
-            <p className="text-sm text-gray-500">Select an agent below, then type your message</p>
+            <h3 className="font-semibold text-2xl text-[#09090B] mb-2">How can I help you?</h3>
+            <p className="text-sm text-[#71717A]">Select an agent below, then type your message</p>
           </div>
         )}
 

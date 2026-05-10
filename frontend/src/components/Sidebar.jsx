@@ -56,17 +56,19 @@ function SessionItem({ session, active, onSelect, onDelete }) {
 
   return (
     <div
-      className={`group relative flex items-center gap-2 px-3 py-2.5 rounded-md cursor-pointer transition-all text-sm ${
-        active ? "bg-gray-100 text-gray-900 font-medium" : "text-gray-700 hover:bg-gray-100"
-      }`}
+          className={`group relative flex items-center gap-2 px-4 py-3 mb-2 mx-3 rounded-lg border border-[#F3F4F6] cursor-pointer transition-all duration-150 text-sm ${
+            active
+              ? "bg-[#F4F4F5] text-[#09090B] font-medium"
+              : "text-[#71717A] hover:bg-[#F4F4F5] hover:text-[#09090B]"
+          }`}
       onClick={() => onSelect(session.session_id)}
       onMouseLeave={() => setConfirming(false)}
     >
       <span className="flex-1 truncate">{session.title || "New Chat"}</span>
       <button
         onClick={handleDelete}
-        className={`flex-shrink-0 p-0.5 rounded transition-all opacity-0 group-hover:opacity-100 ${
-          confirming ? "text-red-500" : "text-gray-400 hover:text-gray-700"
+        className={`flex-shrink-0 p-1 rounded transition duration-150 ease-out opacity-0 group-hover:opacity-100 ${
+          confirming ? "text-gray-900" : "text-gray-400 hover:text-gray-700"
         }`}
         title={confirming ? "Click again to delete" : "Delete"}
       >
@@ -109,40 +111,40 @@ export default function Sidebar({ activeSessionId, onSessionSelect, onNewSession
   };
 
   const initials = user
-    ? `${user.f_name?.[0] || ""}${user.l_name?.[0] || ""}`.toUpperCase() || user.email?.[0]?.toUpperCase() || "?"
+    ? (user.f_name?.[0] || user.email?.[0] || "?").toUpperCase()
     : "?";
 
   const displayName = user ? user.f_name || user.email : "";
 
   return (
-    <aside className="flex flex-col h-full w-full bg-white border-r border-gray-200">
-      <div className="px-4 pt-5 pb-4 flex-shrink-0 border-b border-gray-200">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 bg-gray-800 rounded flex items-center justify-center flex-shrink-0">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <aside className="flex flex-col h-full w-full bg-white border-r border-[#EBEBEB]">
+      <div className="px-5 pt-5 pb-4 flex-shrink-0">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 bg-[#18181B] text-white">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
           </div>
-          <span className="font-semibold text-gray-900 text-xl">Preddi</span>
+          <span className="font-semibold text-[#09090B] text-lg tracking-tight">Preddi</span>
         </div>
 
         <button
           onClick={handleNew}
           disabled={creating}
-          className="w-full flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all text-white bg-gray-900 hover:bg-gray-800 disabled:opacity-60"
+          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition duration-150 text-[#09090B] bg-[#F4F4F5] hover:bg-[#EBEBEB] disabled:opacity-60"
         >
           <PlusIcon />
           {creating ? "Creating…" : "New Chat"}
         </button>
       </div>
 
-      <div className="px-4 pt-4 pb-1 flex-shrink-0">
-        <p className="text-xs font-medium text-gray-500 mb-2">Recent</p>
+      <div className="px-5 pb-2 flex-shrink-0">
+        <p className="text-[11px] font-medium px-3 mb-1 uppercase tracking-[0.2em] text-[#71717A]">Recent</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-thin">
         {sessions.length === 0 ? (
-          <p className="text-xs text-center py-6 text-gray-400">No conversations yet</p>
+          <p className="text-xs text-center py-6 text-[#71717A]">No conversations yet</p>
         ) : (
           sessions.map((s) => (
             <SessionItem
@@ -156,19 +158,19 @@ export default function Sidebar({ activeSessionId, onSessionSelect, onNewSession
         )}
       </div>
 
-      <div className="px-4 py-4 flex-shrink-0 border-t border-gray-200">
+      <div className="px-5 py-4 flex-shrink-0 border-t border-[#EBEBEB] bg-white">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 bg-gray-700">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-medium flex-shrink-0 bg-[#18181B]">
             {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate text-gray-900">{displayName}</p>
-            <p className="text-xs truncate text-gray-500">{user?.email}</p>
+            <p className="text-[13px] font-medium truncate text-[#09090B]">{displayName}</p>
+            <p className="text-[12px] truncate text-[#71717A]">{user?.email}</p>
           </div>
           <button
             onClick={logout}
             title="Sign out"
-            className="p-1.5 rounded-lg transition-all text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+            className="p-2 rounded-full transition duration-150 ease-out text-[#71717A] hover:bg-[#F4F4F5] hover:text-[#09090B]"
           >
             <SignOutIcon />
           </button>
