@@ -26,7 +26,7 @@ function AgentDropdown({ agent, onSelect, skills }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-medium transition duration-150 ease-out bg-[#F4F4F5] text-[#18181B] border border-[#E4E4E7] hover:bg-[#F8F8F8]"
+        className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-semibold transition duration-150 ease-out bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff] hover:bg-[#b8c3ff]/40"
         title="Select agent"
       >
         @{agent}
@@ -36,14 +36,16 @@ function AgentDropdown({ agent, onSelect, skills }) {
       </button>
 
       {open && (
-        <div className="absolute bottom-full mb-1.5 left-0 z-50 rounded-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.08)] border border-[#E4E4E7] bg-white overflow-hidden min-w-36">
+        <div className="absolute bottom-full mb-1.5 left-0 z-50 rounded-xl shadow-lg border border-[#eae1db] bg-white overflow-hidden min-w-36">
           <div className="py-1">
             {options.map((opt) => (
               <button
                 key={opt}
                 type="button"
                 className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left transition duration-150 ease-out ${
-                  opt === agent ? "bg-[#F4F4F5] text-[#18181B] font-medium" : "text-[#09090B] hover:bg-[#F4F4F5]"
+                  opt === agent
+                    ? "bg-[#dde1ff] text-[#0d2678] font-semibold"
+                    : "text-[#1f1b17] hover:bg-[#f6ece6]"
                 }`}
                 onClick={() => { onSelect(opt); setOpen(false); }}
               >
@@ -76,11 +78,11 @@ function FilePreview({ file, onRemove }) {
   if (thumb) {
     return (
       <div className="relative inline-flex">
-        <img src={thumb} alt="attachment preview" className="h-12 w-12 rounded-lg object-cover border-[1.5px] border-[#E4E4E7]" />
+        <img src={thumb} alt="attachment preview" className="h-12 w-12 rounded-lg object-cover border-[1.5px] border-[#eae1db]" />
         <button
           type="button"
           onClick={onRemove}
-          className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center text-white text-xs leading-none bg-[#71717A] hover:bg-[#18181B]"
+          className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center text-white text-xs leading-none bg-[#757683] hover:bg-[#0d2678]"
         >
           ×
         </button>
@@ -89,13 +91,13 @@ function FilePreview({ file, onRemove }) {
   }
 
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-[#F4F4F5] text-[#71717A] border border-[#E4E4E7]">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff]">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
         <polyline points="14 2 14 8 20 8" />
       </svg>
       {file.name}
-      <button type="button" onClick={onRemove} className="hover:opacity-70 transition-opacity leading-none">
+      <button type="button" onClick={onRemove} className="hover:opacity-70 transition-opacity leading-none ml-0.5">
         ×
       </button>
     </span>
@@ -200,101 +202,104 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
   const hasContent = text.trim() || file;
 
   return (
-    <div className="px-4 sm:px-6 md:px-8 pb-6 sm:pb-8 pt-4 flex-shrink-0 bg-[#F8F8F8] border-t border-[#EBEBEB]">
+    <div className="px-4 sm:px-6 md:px-8 pb-5 sm:pb-6 pt-3 flex-shrink-0 bg-[#fff8f5] border-t border-[#eae1db]">
       <div className="w-full relative">
         <div
-          className="relative rounded-[16px] shadow-[0_1px_3px_rgba(0,0,0,0.04)] bg-white border border-[#E4E4E7]"
+          className="relative group"
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
-          {atQuery !== null && (
-            <div className="absolute bottom-full left-0 w-full z-10">
-              <SkillSelector query={atQuery} onSelect={handleSkillSelect} onClose={() => setAtQuery(null)} />
-            </div>
-          )}
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-[#0d2678] to-[#0061a2] rounded-2xl opacity-0 group-focus-within:opacity-10 blur transition duration-300 pointer-events-none" />
+          <div className="relative rounded-[18px] bg-white border border-[#eae1db] shadow-sm ring-1 ring-black/[0.03]">
+            {atQuery !== null && (
+              <div className="absolute bottom-full left-0 w-full z-10">
+                <SkillSelector query={atQuery} onSelect={handleSkillSelect} onClose={() => setAtQuery(null)} />
+              </div>
+            )}
 
-          {file && (
-            <div className="flex flex-wrap items-center gap-2 px-4 pt-3">
-              <FilePreview file={file} onRemove={() => setFile(null)} />
-            </div>
-          )}
+            {file && (
+              <div className="flex flex-wrap items-center gap-2 px-4 pt-3">
+                <FilePreview file={file} onRemove={() => setFile(null)} />
+              </div>
+            )}
 
+            <textarea
+              ref={textareaRef}
+              value={text}
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
+              placeholder="Message Pai… (@ to pick a skill)"
+              disabled={disabled}
+              rows={1}
+              className="w-full resize-none bg-transparent px-4 py-4 text-[14px] outline-none disabled:opacity-50 text-[#1f1b17] leading-relaxed overflow-auto max-h-[200px] placeholder:text-[#757683]"
+              onInput={(e) => {
+                e.target.style.height = "auto";
+                e.target.style.height = Math.min(e.target.scrollHeight, 200) + "px";
+              }}
+            />
 
-          <textarea
-            ref={textareaRef}
-            value={text}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-            placeholder="Message Preddi… (@ to pick a skill)"
-            disabled={disabled}
-            rows={1}
-            className="w-full resize-none bg-transparent px-4 py-4 text-[14px] outline-none disabled:opacity-50 text-[#09090B] leading-relaxed overflow-auto max-h-[200px]"
-            onInput={(e) => {
-              e.target.style.height = "auto";
-              e.target.style.height = Math.min(e.target.scrollHeight, 200) + "px";
-            }}
-          />
+            <div className="flex items-center justify-between px-3 pb-3">
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  className="p-2 rounded-lg transition duration-150 ease-out text-[#757683] hover:text-[#0d2678] hover:bg-[#f0e6e0]"
+                  title="Attach file"
+                >
+                  <AttachIcon />
+                </button>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => setFile(e.target.files[0] || null)}
+                  accept="image/*,.pdf,.txt,.csv,.docx,.xlsx"
+                />
 
-          <div className="flex items-center justify-between px-3 pb-3">
-            <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={speech.toggle}
+                  disabled={!speech.supported}
+                  className={`relative p-2 rounded-lg transition duration-150 ease-out disabled:opacity-40 ${
+                    speech.listening
+                      ? "text-[#0d2678] bg-[#dde1ff]"
+                      : "text-[#757683] hover:text-[#0d2678] hover:bg-[#f0e6e0]"
+                  }`}
+                  title={!speech.supported ? "Voice input not supported" : speech.listening ? "Stop recording" : "Voice input"}
+                >
+                  {speech.listening && (
+                    <span className="absolute inset-0 rounded-lg animate-mic-pulse bg-[#0d2678]/10 pointer-events-none" />
+                  )}
+                  <span className="relative">
+                    <MicIcon filled={speech.listening} />
+                  </span>
+                </button>
+
+                <span className="text-[#c5c5d3] text-xs mx-0.5">|</span>
+
+                <AgentDropdown agent={agent || "General"} onSelect={onAgentChange || (() => {})} skills={skills} />
+              </div>
+
               <button
                 type="button"
-                onClick={() => fileRef.current?.click()}
-                className="p-2 rounded-lg transition duration-150 ease-out text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5]"
-                title="Attach file"
-              >
-                <AttachIcon />
-              </button>
-              <input
-                ref={fileRef}
-                type="file"
-                className="hidden"
-                onChange={(e) => setFile(e.target.files[0] || null)}
-                accept="image/*,.pdf,.txt,.csv,.docx,.xlsx"
-              />
-
-              <button
-                type="button"
-                onClick={speech.toggle}
-                disabled={!speech.supported}
-                className={`relative p-2 rounded-lg transition duration-150 ease-out disabled:opacity-40 ${
-                  speech.listening
-                    ? "text-[#18181B] bg-[#F4F4F5]"
-                    : "text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5]"
+                onClick={handleSend}
+                disabled={disabled || !hasContent}
+                className={`h-8 w-8 rounded-full transition duration-150 ease-out disabled:opacity-30 flex items-center justify-center ${
+                  hasContent && !disabled
+                    ? "bg-[#0d2678] text-white hover:bg-[#0d2678]/90 active:scale-[0.96] shadow-sm"
+                    : "bg-[#eae1db] text-[#757683]"
                 }`}
-                title={!speech.supported ? "Voice input not supported" : speech.listening ? "Stop recording" : "Voice input"}
               >
-                {speech.listening && (
-                  <span className="absolute inset-0 rounded-lg animate-mic-pulse bg-black/15 pointer-events-none" />
-                )}
-                <span className="relative">
-                  <MicIcon filled={speech.listening} />
-                </span>
+                <SendIcon />
               </button>
-
-              <span className="text-[#D4D4D8] text-xs">|</span>
-
-              <AgentDropdown agent={agent || "General"} onSelect={onAgentChange || (() => {})} skills={skills} />
             </div>
-
-            <button
-              type="button"
-              onClick={handleSend}
-              disabled={disabled || !hasContent}
-              className={`h-8 w-8 rounded-full transition duration-150 ease-out disabled:opacity-30 ${
-                hasContent && !disabled ? "bg-[#18181B] text-white hover:bg-[#0f0f10] active:scale-[0.98]" : "bg-gray-200 text-gray-400"
-              }`}
-            >
-              <SendIcon />
-            </button>
           </div>
         </div>
-        <p className="text-center text-xs mt-3 text-[#71717A]">
+        <p className="text-center text-xs mt-3 text-[#757683]">
           Enter to send · Shift+Enter for new line · @ to pick a skill
         </p>
       </div>
-
     </div>
   );
 }
