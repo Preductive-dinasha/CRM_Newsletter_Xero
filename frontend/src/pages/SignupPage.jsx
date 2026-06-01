@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { MessageSquare, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { register } from "../api/auth";
 
 const RULES = [
@@ -37,12 +38,12 @@ function PasswordStrength({ password }) {
   if (!password) return null;
 
   return (
-    <div className="mt-2">
+    <div className="mt-2.5">
       <div className="flex gap-1 mb-1.5">
         {RULES.map((_, i) => (
           <div
             key={i}
-            className={`h-1 flex-1 rounded-full transition-all duration-300 ${i < passed ? strengthColor(passed) : "bg-[#eae1db]"}`}
+            className={`h-1 flex-1 rounded-sm transition-all duration-300 ${i < passed ? strengthColor(passed) : "bg-[#eae1db]"}`}
           />
         ))}
       </div>
@@ -66,32 +67,7 @@ function PasswordStrength({ password }) {
 }
 
 const inputCls =
-  "w-full px-4 py-3 bg-white/60 border border-[#c5c5d3] rounded-lg text-sm text-[#1f1b17] outline-none transition-all duration-200 focus:border-[#0d2678] focus:ring-2 focus:ring-[#0d2678]/15 placeholder:text-[#757683]";
-
-function ChatIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
-  );
-}
-
-function EyeIcon({ off }) {
-  if (off) {
-    return (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-        <line x1="1" y1="1" x2="23" y2="23" />
-      </svg>
-    );
-  }
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}
+  "w-full px-4 py-3.5 bg-white/60 border border-[#c5c5d3] rounded-md text-sm text-[#1f1b17] outline-none transition-all duration-200 focus:border-[#0d2678] focus:ring-2 focus:ring-[#0d2678]/15 placeholder:text-[#757683]";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -144,34 +120,34 @@ export default function SignupPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center px-5 py-10"
+      className="min-h-screen flex items-center justify-center px-5 py-10 font-body"
       style={{
         backgroundColor: "#fff8f5",
         backgroundImage:
           "radial-gradient(at 0% 0%, rgba(13,38,120,0.06) 0px, transparent 55%), radial-gradient(at 100% 100%, rgba(0,97,162,0.06) 0px, transparent 55%)",
       }}
     >
-      <div className="w-full max-w-[420px] flex flex-col items-center">
-        <header className="mb-8 flex flex-col items-center text-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#0d2678] flex items-center justify-center mb-4 shadow-lg">
-            <ChatIcon />
+      <div className="w-full max-w-[440px] flex flex-col items-center">
+        <header className="mb-9 flex flex-col items-center text-center">
+          <div className="w-16 h-16 rounded-lg bg-[#0d2678] flex items-center justify-center mb-4 shadow-lg">
+            <MessageSquare size={28} strokeWidth={2.2} className="text-white" />
           </div>
           <h1 className="text-[28px] font-bold text-[#0d2678] leading-tight" style={{ fontFamily: "'Outfit', sans-serif" }}>
             Create your account
           </h1>
-          <p className="text-sm mt-1 text-[#454651]">Join Pai to get started</p>
+          <p className="text-sm mt-1.5 text-[#454651]">Join Pai to get started</p>
         </header>
 
-        <section className="glass-panel w-full rounded-xl p-8 shadow-sm">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <section className="glass-panel w-full rounded-lg p-9 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="p-3 rounded-lg text-sm bg-[#ffdad6] text-[#ba1a1a] border border-[#ffdad6]">
+              <div className="p-3.5 rounded-md text-sm bg-[#ffdad6] text-[#ba1a1a] border border-[#ffdad6]">
                 {error}
               </div>
             )}
 
             <div className="flex gap-3">
-              <div className="flex-1 space-y-1.5">
+              <div className="flex-1 space-y-2">
                 <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">First name</label>
                 <input
                   type="text"
@@ -183,7 +159,7 @@ export default function SignupPage() {
                   className={inputCls}
                 />
               </div>
-              <div className="flex-1 space-y-1.5">
+              <div className="flex-1 space-y-2">
                 <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">Last name</label>
                 <input
                   type="text"
@@ -197,7 +173,7 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">Email</label>
               <input
                 type="email"
@@ -210,7 +186,7 @@ export default function SignupPage() {
               />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">
                 Company{" "}
                 <span className="font-normal text-[#757683]">(optional)</span>
@@ -225,7 +201,7 @@ export default function SignupPage() {
               />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">Password</label>
               <div className="relative">
                 <input
@@ -240,16 +216,16 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-[#757683] hover:text-[#1f1b17] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-[#757683] hover:text-[#1f1b17] hover:bg-[#f0e6e0] transition-colors"
                   title={showPassword ? "Hide password" : "Show password"}
                 >
-                  <EyeIcon off={showPassword} />
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               <PasswordStrength password={form.password} />
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">Confirm password</label>
               <div className="relative">
                 <input
@@ -264,10 +240,10 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setShowConfirm((prev) => !prev)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-[#757683] hover:text-[#1f1b17] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-[#757683] hover:text-[#1f1b17] hover:bg-[#f0e6e0] transition-colors"
                   title={showConfirm ? "Hide password" : "Show password"}
                 >
-                  <EyeIcon off={showConfirm} />
+                  {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               {form.confirm && form.confirm !== form.password && (
@@ -278,20 +254,15 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg text-white text-sm font-semibold bg-[#0d2678] hover:bg-[#0d2678]/90 active:scale-[0.98] transition-all duration-200 shadow-md disabled:opacity-60 group mt-2"
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-md text-white text-sm font-semibold bg-[#0d2678] hover:bg-[#0d2678]/90 active:scale-[0.99] transition-all duration-200 shadow-md disabled:opacity-60 group mt-2"
             >
               {loading ? "Creating account…" : "Create account"}
-              {!loading && (
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-0.5 transition-transform">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              )}
+              {!loading && <ArrowRight size={16} strokeWidth={2.5} className="group-hover:translate-x-0.5 transition-transform" />}
             </button>
           </form>
         </section>
 
-        <footer className="mt-7 text-center">
+        <footer className="mt-8 text-center">
           <p className="text-sm text-[#454651]">
             Already have an account?{" "}
             <button

@@ -1,19 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 
-const SKILL_COLORS = {
-  CRM: "bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff]",
-  Newsletter: "bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff]",
-  Xero: "bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff]",
-};
-
-function getSkillCls(skill) {
-  return SKILL_COLORS[skill] || "bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff]";
-}
+const SKILL_CLS = "bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff]";
 
 export function SkillChip({ skill, onRemove }) {
-  const cls = getSkillCls(skill);
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${cls}`}>
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold ${SKILL_CLS}`}>
       @{skill}
       {onRemove && (
         <button
@@ -30,9 +21,8 @@ export function SkillChip({ skill, onRemove }) {
 }
 
 export function SkillBadge({ skill }) {
-  const cls = getSkillCls(skill);
   return (
-    <span className={`inline-flex items-center px-2 py-1 rounded-full text-[12px] font-semibold ${cls}`}>
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[12px] font-semibold ${SKILL_CLS}`}>
       @{skill}
     </span>
   );
@@ -80,19 +70,19 @@ export default function SkillSelector({ query, onSelect, onClose, skills }) {
   return (
     <div
       ref={ref}
-      className="rounded-xl shadow-lg border border-[#eae1db] bg-white overflow-hidden min-w-40"
+      className="rounded-lg shadow-lg border border-[#eae1db] bg-white overflow-hidden min-w-40"
     >
-      <div className="px-3 py-2 border-b border-[#eae1db] bg-[#fcf2ec]">
+      <div className="px-3.5 py-2 border-b border-[#eae1db] bg-[#fcf2ec]">
         <p className="text-xs font-semibold text-[#454651] uppercase tracking-wider">Skills</p>
       </div>
-      <div className="py-1">
+      <div className="py-1.5">
         {filtered.map((skill, i) => {
           const isHi = i === highlighted;
           return (
             <button
               key={skill}
               type="button"
-              className={`w-full flex items-center gap-2 px-3 py-2 text-[13px] text-left transition duration-150 ease-out ${
+              className={`w-full flex items-center gap-2 px-3.5 py-2 text-[13px] text-left transition duration-150 ease-out ${
                 isHi ? "bg-[#dde1ff] text-[#0d2678] font-semibold" : "text-[#1f1b17] hover:bg-[#f6ece6]"
               }`}
               onMouseEnter={() => setHighlighted(i)}

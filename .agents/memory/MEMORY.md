@@ -1,0 +1,1 @@
+- [Frontend deps install location](frontend-deps-install-location.md) — install React/UI libs into frontend/ not workspace root, or you get dual-React "Invalid hook call".
