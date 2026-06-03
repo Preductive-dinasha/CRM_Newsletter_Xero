@@ -1,0 +1,690 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff8f5;color:#1f1b17;-webkit-font-smoothing:antialiased;height:100%;overflow:hidden}
+h1,h2,h3,h4{font-family:'Outfit',sans-serif}
+.glass-panel{background:rgba(255,255,255,0.82);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid #eae1db}
+.input-field{width:100%;padding:12px 16px;background:rgba(255,255,255,0.5);border:1px solid #c5c5d3;border-radius:8px;font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;color:#1f1b17;outline:none;transition:border-color .2s,box-shadow .2s}
+.input-field::placeholder{color:#757683}
+.input-field:focus{border-color:#0d2678;box-shadow:0 0 0 3px rgba(13,38,120,.12)}
+.input-field.error{border-color:#ba1a1a;box-shadow:0 0 0 3px rgba(186,26,26,.1)}
+.btn-primary{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 20px;border-radius:8px;background:#0d2678;color:#fff;font-size:14px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;border:none;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(13,38,120,.25)}
+.btn-primary:hover{background:rgba(13,38,120,.9)}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.btn-outlined{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border-radius:8px;background:transparent;color:#1f1b17;font-size:13px;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;border:1px solid #c5c5d3;cursor:pointer;transition:all .15s}
+.btn-outlined:hover{background:rgba(255,255,255,.8)}
+.icon-btn{padding:8px;border-radius:6px;background:transparent;border:none;cursor:pointer;color:#757683;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.icon-btn:hover{background:#f0e6e0;color:#0d2678}
+.icon-btn:disabled{opacity:.4;cursor:not-allowed}
+.send-btn{width:40px;height:40px;border-radius:12px;background:#0d2678;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white;transition:all .15s;box-shadow:0 1px 4px rgba(13,38,120,.25)}
+.send-btn:hover:not(:disabled){background:rgba(13,38,120,.9);transform:scale(1.05)}
+.send-btn:active:not(:disabled){transform:scale(.95)}
+.send-btn:disabled{background:#eae1db;color:#757683;cursor:not-allowed;box-shadow:none}
+.skill-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:9999px;background:#f0e6e0;border:1px solid #eae1db;font-size:11px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;color:#0d2678;letter-spacing:.03em;cursor:pointer;transition:background .15s}
+.skill-chip:hover{background:#eae1db}
+.agent-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;background:#0d2678;color:white;border:1px solid #2a3e8f;font-family:'Plus Jakarta Sans',sans-serif}
+.session-item{display:flex;align-items:center;gap:8px;padding:8px 14px;margin-bottom:4px;border-radius:6px;border-left:2px solid transparent;cursor:pointer;transition:all .15s;font-size:13px;color:#454651}
+.session-item:hover{background:#f0e6e0;color:#1f1b17}
+.session-item.active{background:#dde1ff;color:#0d2678;font-weight:700;border-left-color:#0d2678}
+.msg-user{padding:12px 16px;font-size:14px;line-height:1.6;background:#0d2678;color:white;border-radius:8px;border-bottom-right-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.msg-ai{padding:12px 16px;font-size:14px;line-height:1.6;background:white;color:#1f1b17;border:1px solid #eae1db;border-radius:8px;border-bottom-left-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.msg-error{padding:12px 16px;font-size:14px;line-height:1.6;background:#ffdad6;color:#ba1a1a;border:1px solid #ffdad6;border-radius:8px;border-bottom-left-radius:2px}
+.chat-input-wrap{border-radius:22px;background:white;border:1px solid #eae1db;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden;transition:box-shadow .2s}
+.chat-input-wrap:focus-within{box-shadow:0 0 0 3px rgba(13,38,120,.08)}
+.chat-textarea{width:100%;resize:none;background:transparent;border:none;outline:none;font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;color:#1f1b17;line-height:1.6;padding:14px 18px;max-height:180px;overflow-y:auto}
+.chat-textarea::placeholder{color:#757683}
+.input-bar-header{padding:7px 14px;background:#fcf2ec;border-bottom:1px solid rgba(234,225,219,.6);font-size:11px;color:#757683;font-weight:700;letter-spacing:.08em;font-family:'Plus Jakarta Sans',sans-serif;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
+.input-bar-footer{padding:7px 12px;background:#fcf2ec;border-top:1px solid rgba(234,225,219,.4);display:flex;align-items:center;justify-content:space-between}
+.footer-hint{font-size:10px;color:#757683;text-align:center;font-family:'Plus Jakarta Sans',sans-serif}
+.avatar-sm{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:12px;font-weight:700;color:white}
+.typing-dot{width:8px;height:8px;border-radius:50%;background:#0d2678;opacity:.7;animation:typingBounce 1.2s ease-in-out infinite}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.strength-bar{height:4px;flex:1;border-radius:2px;transition:background .3s}
+.scrollbar-thin::-webkit-scrollbar{width:3px}
+.scrollbar-thin::-webkit-scrollbar-thumb{background:#c5c5d3;border-radius:999px}
+.scrollbar-thin::-webkit-scrollbar-track{background:transparent}
+.page{display:none;width:100%;height:100%}
+.page.active{display:flex}
+.bg-decor-tl{position:fixed;top:-10%;left:-10%;width:40%;height:40%;background:rgba(13,38,120,.05);filter:blur(120px);border-radius:50%;pointer-events:none;z-index:0}
+.bg-decor-br{position:fixed;bottom:-10%;right:-10%;width:30%;height:30%;background:rgba(0,97,162,.06);filter:blur(100px);border-radius:50%;pointer-events:none;z-index:0}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .4s ease-out forwards}
+</style>
+</head>
+<body style="height:100vh;overflow:hidden">
+
+<!-- Background decorative elements -->
+<div class="bg-decor-tl"></div>
+<div class="bg-decor-br"></div>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div id="page-login" class="page active" style="flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:#fff8f5;background-image:radial-gradient(at 0% 0%,rgba(13,38,120,.06) 0px,transparent 55%),radial-gradient(at 100% 100%,rgba(0,97,162,.06) 0px,transparent 55%);position:relative;z-index:1;overflow-y:auto">
+  <div style="width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center" class="fade-up">
+    <header style="margin-bottom:36px;display:flex;flex-direction:column;align-items:center;text-align:center">
+      <div style="width:80px;height:80px;border-radius:32px;background:#0d2678;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 8px 24px rgba(13,38,120,.3)">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <h1 style="font-size:28px;font-weight:700;color:#0d2678;line-height:1.2">Welcome to Pai</h1>
+      <p style="font-size:14px;margin-top:6px;color:#454651">Sign in to continue</p>
+    </header>
+
+    <section class="glass-panel" style="width:100%;border-radius:16px;padding:36px">
+      <div id="login-error" style="display:none;padding:12px 14px;border-radius:6px;font-size:13px;background:#ffdad6;color:#ba1a1a;border:1px solid #ffdad6;margin-bottom:20px"></div>
+      
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-size:13px;font-weight:700;color:#1f1b17;margin-bottom:6px;margin-left:2px">Email</label>
+        <input id="login-email" type="email" placeholder="name@company.com" autocomplete="email" class="input-field"/>
+      </div>
+
+      <div style="margin-bottom:24px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;margin-left:2px">
+          <label style="font-size:13px;font-weight:700;color:#1f1b17">Password</label>
+          <button style="font-size:11px;font-weight:700;color:#0061a2;background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.05em" onmouseover="this.style.color='#0d2678'" onmouseout="this.style.color='#0061a2'">Forgot password?</button>
+        </div>
+        <div style="position:relative">
+          <input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password" class="input-field" style="padding-right:44px"/>
+          <button onclick="togglePw('login-password','login-eye')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);padding:6px;border-radius:6px;background:none;border:none;cursor:pointer;color:#757683;display:flex;align-items:center;transition:all .15s" onmouseover="this.style.background='#f0e6e0';this.style.color='#1f1b17'" onmouseout="this.style.background='none';this.style.color='#757683'">
+            <svg id="login-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="handleLogin()">
+        <span id="login-btn-text">Sign in</span>
+        <svg id="login-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+
+      <div style="margin-top:24px;display:flex;align-items:center;gap:12px">
+        <div style="flex:1;height:1px;background:#eae1db"></div>
+        <span style="font-size:11px;font-weight:700;color:#757683;text-transform:uppercase;letter-spacing:.08em">or continue with</span>
+        <div style="flex:1;height:1px;background:#eae1db"></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+        <button class="btn-outlined">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Google
+        </button>
+        <button class="btn-outlined">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0d2678" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          SSO
+        </button>
+      </div>
+    </section>
+
+    <footer style="margin-top:28px;text-align:center">
+      <p style="font-size:14px;color:#454651">Don't have an account?
+        <button onclick="showPage('signup')" style="font-weight:700;color:#0d2678;background:none;border:none;cursor:pointer;margin-left:4px;text-decoration:underline;text-underline-offset:3px">Sign up</button>
+      </p>
+    </footer>
+  </div>
+</div>
+
+<!-- ===== SIGNUP PAGE ===== -->
+<div id="page-signup" class="page" style="flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:#fff8f5;background-image:radial-gradient(at 0% 0%,rgba(13,38,120,.06) 0px,transparent 55%),radial-gradient(at 100% 100%,rgba(0,97,162,.06) 0px,transparent 55%);position:relative;z-index:1;overflow-y:auto">
+  <div style="width:100%;max-width:440px;display:flex;flex-direction:column;align-items:center" class="fade-up">
+    <header style="margin-bottom:36px;display:flex;flex-direction:column;align-items:center;text-align:center">
+      <div style="width:80px;height:80px;border-radius:32px;background:#0d2678;display:flex;align-items:center;justify-content:center;margin-bottom:16px;box-shadow:0 8px 24px rgba(13,38,120,.3)">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <h1 style="font-size:28px;font-weight:700;color:#0d2678;line-height:1.2">Create your account</h1>
+      <p style="font-size:14px;margin-top:6px;color:#454651">Join Pai to get started</p>
+    </header>
+
+    <section class="glass-panel" style="width:100%;border-radius:16px;padding:36px">
+      <div id="signup-error" style="display:none;padding:12px 14px;border-radius:6px;font-size:13px;background:#ffdad6;color:#ba1a1a;border:1px solid #ffdad6;margin-bottom:20px"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px">
+        <div>
+          <label style="display:block;font-size:13px;font-weight:700;color:#1f1b17;margin-bottom:6px;margin-left:2px">First name</label>
+          <input id="su-fname" type="text" placeholder="Jane" autocomplete="given-name" class="input-field"/>
+        </div>
+        <div>
+          <label style="display:block;font-size:13px;font-weight:700;color:#1f1b17;margin-bottom:6px;margin-left:2px">Last name</label>
+          <input id="su-lname" type="text" placeholder="Smith" autocomplete="family-name" class="input-field"/>
+        </div>
+      </div>
+
+      <div style="margin-bottom:18px">
+        <label style="display:block;font-size:13px;font-weight:700;color:#1f1b17;margin-bottom:6px;margin-left:2px">Email</label>
+        <input id="su-email" type="email" placeholder="you@company.com" autocomplete="email" class="input-field"/>
+      </div>
+
+      <div style="margin-bottom:18px">
+        <label style="display:block;font-size:13px;font-weight:700;color:#1f1b17;margin-bottom:6px;margin-left:2px">Company <span style="font-weight:400;color:#757683">(optional)</span></label>
+        <input id="su-company" type="text" placeholder="Acme Corp" autocomplete="organization" class="input-field"/>
+      </div>
+
+      <div style="margin-bottom:18px">
+        <label style="display:block;font-size:13px;font-weight:700;color:#1f1b17;margin-bottom:6px;margin-left:2px">Password</label>
+        <div style="position:relative">
+          <input id="su-password" type="password" placeholder="••••••••" autocomplete="new-password" class="input-field" style="padding-right:44px" oninput="updateStrength()"/>
+          <button onclick="togglePw('su-password','su-eye')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);padding:6px;border-radius:6px;background:none;border:none;cursor:pointer;color:#757683;display:flex;align-items:center;transition:all .15s" onmouseover="this.style.background='#f0e6e0'" onmouseout="this.style.background='none'">
+            <svg id="su-eye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div id="strength-meter" style="display:none;margin-top:10px">
+          <div style="display:flex;gap:4px;margin-bottom:6px">
+            <div class="strength-bar" id="sb0" style="background:#eae1db"></div>
+            <div class="strength-bar" id="sb1" style="background:#eae1db"></div>
+            <div class="strength-bar" id="sb2" style="background:#eae1db"></div>
+            <div class="strength-bar" id="sb3" style="background:#eae1db"></div>
+            <div class="strength-bar" id="sb4" style="background:#eae1db"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span id="strength-label" style="font-size:12px;font-weight:700;color:#757683"></span>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end">
+              <span id="r0" style="font-size:11px;color:#c5c5d3">· 8+ chars</span>
+              <span id="r1" style="font-size:11px;color:#c5c5d3">· Uppercase</span>
+              <span id="r2" style="font-size:11px;color:#c5c5d3">· Lowercase</span>
+              <span id="r3" style="font-size:11px;color:#c5c5d3">· Number</span>
+              <span id="r4" style="font-size:11px;color:#c5c5d3">· Special</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:24px">
+        <label style="display:block;font-size:13px;font-weight:700;color:#1f1b17;margin-bottom:6px;margin-left:2px">Confirm password</label>
+        <div style="position:relative">
+          <input id="su-confirm" type="password" placeholder="••••••••" autocomplete="new-password" class="input-field" style="padding-right:44px" oninput="checkConfirm()"/>
+          <button onclick="togglePw('su-confirm','su-ceye')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);padding:6px;border-radius:6px;background:none;border:none;cursor:pointer;color:#757683;display:flex;align-items:center" onmouseover="this.style.background='#f0e6e0'" onmouseout="this.style.background='none'">
+            <svg id="su-ceye" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <p id="confirm-error" style="display:none;font-size:12px;color:#ba1a1a;margin-top:4px">Passwords do not match</p>
+      </div>
+
+      <button class="btn-primary" onclick="handleSignup()">
+        <span id="signup-btn-text">Create account</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </section>
+
+    <footer style="margin-top:28px;text-align:center">
+      <p style="font-size:14px;color:#454651">Already have an account?
+        <button onclick="showPage('login')" style="font-weight:700;color:#0d2678;background:none;border:none;cursor:pointer;margin-left:4px;text-decoration:underline;text-underline-offset:3px">Sign in</button>
+      </p>
+    </footer>
+  </div>
+</div>
+
+<!-- ===== CHAT PAGE ===== -->
+<div id="page-chat" class="page" style="flex-direction:row;height:100vh;background:#fff8f5;position:relative;z-index:1">
+
+  <!-- Mobile sidebar overlay -->
+  <div id="sidebar-overlay" onclick="toggleSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.2);z-index:40;backdrop-filter:blur(2px)"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" style="width:280px;flex-shrink:0;display:flex;flex-direction:column;height:100vh;background:#fcf2ec;border-right:1px solid #eae1db;transition:transform .3s;z-index:50">
+    <div style="padding:24px 20px 20px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <div style="width:36px;height:36px;border-radius:8px;background:#0d2678;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 6px rgba(13,38,120,.25)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;color:#0d2678;line-height:1.1">Pai</div>
+          <div style="font-size:10px;color:#757683;text-transform:uppercase;letter-spacing:.15em;font-weight:700">Cognitive CRM</div>
+        </div>
+      </div>
+      <button onclick="newSession()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:6px;background:#0d2678;color:white;font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;border:none;cursor:pointer;transition:all .15s;box-shadow:0 2px 6px rgba(13,38,120,.2)" onmouseover="this.style.opacity='.9'" onmouseout="this.style.opacity='1'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Conversation
+      </button>
+    </div>
+
+    <div style="padding:0 24px 8px">
+      <p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:#757683">Recent</p>
+    </div>
+
+    <div id="session-list" class="scrollbar-thin" style="flex:1;overflow-y:auto;padding:0 14px 16px"></div>
+
+    <div style="padding:16px 20px;border-top:1px solid #eae1db;background:#fcf2ec;flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:36px;height:36px;border-radius:6px;background:#0d2678;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;font-weight:700;flex-shrink:0;box-shadow:0 1px 4px rgba(13,38,120,.2)" id="user-avatar">P</div>
+        <div style="flex:1;min-width:0">
+          <p style="font-size:13px;font-weight:700;color:#1f1b17;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="user-name">Jane Smith</p>
+          <p style="font-size:11px;color:#757683;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="user-email">jane@company.com</p>
+        </div>
+        <button onclick="handleLogout()" title="Sign out" class="icon-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main chat area -->
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden">
+    <!-- Header -->
+    <header style="flex-shrink:0;display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(255,248,245,.85);backdrop-filter:blur(12px);border-bottom:1px solid #eae1db;box-shadow:0 1px 3px rgba(0,0,0,.04)">
+      <button onclick="toggleSidebar()" class="icon-btn" title="Toggle sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <h1 id="chat-title" style="font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;color:#1f1b17;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">New Chat</h1>
+      <div class="agent-pill" id="agent-badge">
+        <span style="width:8px;height:8px;border-radius:50%;background:#5cadfe;animation:typingBounce 1.2s ease-in-out infinite;flex-shrink:0"></span>
+        <span id="agent-badge-text">@CRM</span>
+      </div>
+    </header>
+
+    <!-- Messages -->
+    <div id="message-list" class="scrollbar-thin" style="flex:1;overflow-y:auto;padding:24px 24px 16px;background:#fff8f5;display:flex;flex-direction:column;gap:20px">
+      <!-- Empty state -->
+      <div id="empty-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;min-height:300px">
+        <div style="width:80px;height:80px;border-radius:12px;background:#dde1ff;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0d2678" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3 style="font-family:'Outfit',sans-serif;font-size:24px;font-weight:700;color:#0d2678;margin-bottom:8px">How can I help you?</h3>
+        <p style="font-size:13px;color:#757683">Select an agent below, then type your message</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px;width:100%;max-width:480px">
+          <button onclick="quickSend('Analyze last quarter sales')" style="display:flex;flex-direction:column;align-items:flex-start;padding:20px;background:white;border:1px solid #eae1db;border-radius:16px;cursor:pointer;text-align:left;transition:all .2s" onmouseover="this.style.borderColor='#b8c3ff';this.style.background='#fcf2ec'" onmouseout="this.style.borderColor='#eae1db';this.style.background='white'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0061a2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            <span style="font-size:13px;font-weight:700;color:#0d2678;margin-bottom:4px">Analyze last quarter sales</span>
+            <span style="font-size:12px;color:#757683;opacity:.7;line-height:1.5">Generate a performance report from CRM data.</span>
+          </button>
+          <button onclick="quickSend('Identify at-risk accounts')" style="display:flex;flex-direction:column;align-items:flex-start;padding:20px;background:white;border:1px solid #eae1db;border-radius:16px;cursor:pointer;text-align:left;transition:all .2s" onmouseover="this.style.borderColor='#b8c3ff';this.style.background='#fcf2ec'" onmouseout="this.style.borderColor='#eae1db';this.style.background='white'">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5cadfe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:10px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span style="font-size:13px;font-weight:700;color:#0d2678;margin-bottom:4px">Identify at-risk accounts</span>
+            <span style="font-size:12px;color:#757683;opacity:.7;line-height:1.5">Scan engagement metrics for churn risks.</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div style="flex-shrink:0;padding:14px 20px 20px;background:#fff8f5;border-top:1px solid #eae1db">
+      <!-- Quick chips -->
+      <div style="display:flex;gap:8px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px">
+        <span class="skill-chip" onclick="setAgent('CRM')">🔗 Connect Data</span>
+        <span class="skill-chip" onclick="setAgent('Newsletter')">📄 Summarize Activity</span>
+        <span class="skill-chip" onclick="setAgent('Xero')">👤 Find Contacts</span>
+      </div>
+
+      <div class="chat-input-wrap" id="input-wrap">
+        <div class="input-bar-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="display:flex;align-items:center;gap:4px;background:#f0e6e0;padding:3px 8px;border-radius:5px;border:1px solid #eae1db;cursor:pointer" onclick="toggleAgentMenu()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0061a2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+              <span id="agent-context-label" style="font-size:11px;font-weight:700;color:#454651">Global CRM</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#757683" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div style="width:4px;height:4px;border-radius:50%;background:#c5c5d3"></div>
+            <span style="font-size:11px;color:#757683">v2.4 Cognitive Model</span>
+          </div>
+          <span style="font-size:10px;font-weight:700;letter-spacing:.1em;color:#757683">AI PROCESSING READY</span>
+        </div>
+
+        <!-- Agent menu dropdown -->
+        <div id="agent-menu" style="display:none;background:white;border-bottom:1px solid #eae1db">
+          <div style="padding:8px 12px;background:#fcf2ec;border-bottom:1px solid #eae1db"><p style="font-size:11px;font-weight:700;color:#454651;text-transform:uppercase;letter-spacing:.08em">Skills</p></div>
+          <div id="agent-menu-items"></div>
+        </div>
+
+        <textarea id="chat-input" class="chat-textarea" rows="1" placeholder="Message Pai… (@ to pick a skill)" oninput="autoResize(this);handleAtTrigger(this)" onkeydown="handleInputKey(event)"></textarea>
+
+        <div class="input-bar-footer">
+          <div style="display:flex;align-items:center;gap:4px">
+            <button class="icon-btn" title="Attach file">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+            </button>
+            <button id="mic-btn" class="icon-btn" onclick="toggleMic()" title="Voice input">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+            <span style="color:#c5c5d3;font-size:12px;margin:0 2px">|</span>
+            <div style="position:relative">
+              <button onclick="toggleAgentDropdown()" style="display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:9999px;font-size:12px;font-weight:700;background:#dde1ff;color:#0d2678;border:1px solid #b8c3ff;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background .15s" onmouseover="this.style.background='rgba(184,195,255,.4)'" onmouseout="this.style.background='#dde1ff'">
+                @<span id="agent-btn-label">CRM</span>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div id="agent-dropdown" style="display:none;position:absolute;bottom:calc(100% + 8px);left:0;background:white;border:1px solid #eae1db;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.1);min-width:140px;overflow:hidden;z-index:100">
+                <div id="agent-dropdown-items"></div>
+              </div>
+            </div>
+          </div>
+          <button id="send-btn" class="send-btn" onclick="sendMsg()" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+      <p class="footer-hint" style="margin-top:10px">Enter to send · Shift+Enter for new line · @ to pick a skill</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let currentUser = null;
+let sessions = [];
+let activeSessionId = null;
+let messages = [];
+let isTyping = false;
+let currentAgent = 'CRM';
+const AGENTS = ['CRM', 'Newsletter', 'Xero'];
+let sessionCounter = 0;
+
+// ─── Navigation ──────────────────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = 'none'; });
+  const p = document.getElementById('page-' + name);
+  p.style.display = 'flex';
+  p.classList.add('active');
+}
+
+// ─── Utility ─────────────────────────────────────────────────────────────────
+function svgEye(id) {
+  return `<svg id="${id}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+}
+function svgEyeOff(id) {
+  return `<svg id="${id}" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+}
+function togglePw(inputId, btnId) {
+  const inp = document.getElementById(inputId);
+  const btn = document.getElementById(btnId).parentElement;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.innerHTML = svgEyeOff(btnId);
+  } else {
+    inp.type = 'password';
+    btn.innerHTML = svgEye(btnId);
+  }
+}
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+}
+function hideError(id) { document.getElementById(id).style.display = 'none'; }
+
+// ─── Login ────────────────────────────────────────────────────────────────────
+function handleLogin() {
+  hideError('login-error');
+  const email = document.getElementById('login-email').value.trim();
+  const pw = document.getElementById('login-password').value;
+  if (!email || !pw) { showError('login-error', 'Please enter your email and password.'); return; }
+  const btn = document.querySelector('#page-login .btn-primary');
+  btn.disabled = true;
+  document.getElementById('login-btn-text').textContent = 'Signing in…';
+  document.getElementById('login-arrow').style.display = 'none';
+  setTimeout(() => {
+    btn.disabled = false;
+    document.getElementById('login-btn-text').textContent = 'Sign in';
+    document.getElementById('login-arrow').style.display = 'inline';
+    currentUser = { name: 'Jane Smith', email, initials: email[0].toUpperCase() };
+    initChat();
+    showPage('chat');
+  }, 900);
+}
+document.getElementById('login-email').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+document.getElementById('login-password').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+
+// ─── Signup ───────────────────────────────────────────────────────────────────
+const STRENGTH_RULES = [
+  { test: p => p.length >= 8 },
+  { test: p => /[A-Z]/.test(p) },
+  { test: p => /[a-z]/.test(p) },
+  { test: p => /\d/.test(p) },
+  { test: p => /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(p) },
+];
+function updateStrength() {
+  const p = document.getElementById('su-password').value;
+  const meter = document.getElementById('strength-meter');
+  if (!p) { meter.style.display = 'none'; return; }
+  meter.style.display = 'block';
+  const passed = STRENGTH_RULES.filter(r => r.test(p)).length;
+  const colors = ['#eae1db','#c5c5d3','#0061a2','#0d2678','#0d2678'];
+  for (let i = 0; i < 5; i++) {
+    document.getElementById('sb'+i).style.background = i < passed ? (passed < 2 ? '#c5c5d3' : passed < 4 ? '#0061a2' : '#0d2678') : '#eae1db';
+  }
+  const labels = ['','Weak','Fair','Good','Strong','Strong'];
+  const labelColors = ['','#757683','#0061a2','#0d2678','#0d2678','#0d2678'];
+  const sl = document.getElementById('strength-label');
+  sl.textContent = labels[passed]; sl.style.color = labelColors[passed];
+  const ruleLabels = ['· 8+ chars','· Uppercase','· Lowercase','· Number','· Special'];
+  STRENGTH_RULES.forEach((r, i) => {
+    const el = document.getElementById('r'+i);
+    el.style.color = r.test(p) ? '#454651' : '#c5c5d3';
+    el.textContent = (r.test(p) ? '✓ ' : '· ') + ruleLabels[i].slice(2);
+  });
+}
+function checkConfirm() {
+  const pw = document.getElementById('su-password').value;
+  const cf = document.getElementById('su-confirm').value;
+  const err = document.getElementById('confirm-error');
+  const inp = document.getElementById('su-confirm');
+  if (cf && cf !== pw) { err.style.display = 'block'; inp.classList.add('error'); }
+  else { err.style.display = 'none'; inp.classList.remove('error'); }
+}
+function handleSignup() {
+  hideError('signup-error');
+  const fn = document.getElementById('su-fname').value.trim();
+  const ln = document.getElementById('su-lname').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const pw = document.getElementById('su-password').value;
+  const cf = document.getElementById('su-confirm').value;
+  if (!fn || !ln) { showError('signup-error', 'First and last name are required.'); return; }
+  if (!email) { showError('signup-error', 'Email is required.'); return; }
+  if (pw !== cf) { showError('signup-error', 'Passwords do not match.'); return; }
+  if (STRENGTH_RULES.filter(r => r.test(pw)).length < 5) { showError('signup-error', 'Password does not meet strength requirements.'); return; }
+  const btn = document.querySelector('#page-signup .btn-primary');
+  btn.disabled = true;
+  document.getElementById('signup-btn-text').textContent = 'Creating account…';
+  setTimeout(() => {
+    btn.disabled = false;
+    document.getElementById('signup-btn-text').textContent = 'Create account';
+    showPage('login');
+  }, 1000);
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+function initChat() {
+  if (currentUser) {
+    document.getElementById('user-avatar').textContent = currentUser.initials;
+    document.getElementById('user-name').textContent = currentUser.name;
+    document.getElementById('user-email').textContent = currentUser.email;
+  }
+  renderAgentMenuItems();
+  renderAgentDropdownItems();
+  setAgent('CRM');
+  newSession();
+}
+function handleLogout() { currentUser = null; sessions = []; activeSessionId = null; messages = []; showPage('login'); }
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  const isMobile = window.innerWidth < 768;
+  if (isMobile) {
+    const hidden = sb.style.transform === 'translateX(-100%)';
+    sb.style.transform = hidden ? 'translateX(0)' : 'translateX(-100%)';
+    ov.style.display = hidden ? 'block' : 'none';
+  } else {
+    const visible = sb.style.width !== '0px' && sb.style.width !== '0';
+    sb.style.width = visible ? '0' : '280px';
+    sb.style.overflow = visible ? 'hidden' : 'visible';
+  }
+}
+
+// responsive sidebar init
+function initSidebar() {
+  const sb = document.getElementById('sidebar');
+  if (window.innerWidth < 768) { sb.style.transform = 'translateX(-100%)'; sb.style.position = 'fixed'; sb.style.inset = '0 auto 0 0'; }
+}
+window.addEventListener('resize', initSidebar);
+
+// Sessions
+function newSession() {
+  sessionCounter++;
+  const id = 'sess-' + sessionCounter;
+  const session = { id, title: 'New Chat' };
+  sessions.unshift(session);
+  activeSessionId = id;
+  messages = [];
+  document.getElementById('chat-title').textContent = 'New Chat';
+  renderSessionList();
+  renderMessages();
+  document.getElementById('chat-input').focus();
+}
+function selectSession(id) {
+  activeSessionId = id;
+  const s = sessions.find(s => s.id === id);
+  if (s) document.getElementById('chat-title').textContent = s.title;
+  messages = s ? (s.messages || []) : [];
+  renderSessionList();
+  renderMessages();
+}
+function renderSessionList() {
+  const list = document.getElementById('session-list');
+  if (!sessions.length) { list.innerHTML = '<p style="font-size:12px;text-align:center;padding:24px 0;color:#757683">No conversations yet</p>'; return; }
+  list.innerHTML = sessions.map(s => `
+    <div class="session-item ${s.id === activeSessionId ? 'active' : ''}" onclick="selectSession('${s.id}')">
+      <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.title}</span>
+      <button onclick="event.stopPropagation();deleteSession('${s.id}')" style="flex-shrink:0;padding:4px;border-radius:4px;background:none;border:none;cursor:pointer;color:#757683;opacity:0;transition:opacity .15s" class="del-btn" onmouseover="this.style.color='#1f1b17'" onmouseout="this.style.color='#757683'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+    </div>`).join('');
+  list.querySelectorAll('.session-item').forEach(el => {
+    el.addEventListener('mouseenter', () => { const btn = el.querySelector('.del-btn'); if(btn) btn.style.opacity = '1'; });
+    el.addEventListener('mouseleave', () => { const btn = el.querySelector('.del-btn'); if(btn) btn.style.opacity = '0'; });
+  });
+}
+function deleteSession(id) {
+  sessions = sessions.filter(s => s.id !== id);
+  if (activeSessionId === id) { if (sessions.length) selectSession(sessions[0].id); else newSession(); }
+  renderSessionList();
+}
+
+// Agents
+function setAgent(a) {
+  currentAgent = a;
+  document.getElementById('agent-badge-text').textContent = '@' + a;
+  document.getElementById('agent-btn-label').textContent = a;
+  document.getElementById('agent-context-label').textContent = a === 'CRM' ? 'Global CRM' : a;
+}
+function renderAgentMenuItems() {
+  const c = document.getElementById('agent-menu-items');
+  c.innerHTML = AGENTS.map(a => `<button onclick="setAgent('${a}');document.getElementById('agent-menu').style.display='none'" style="width:100%;display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;background:none;border:none;cursor:pointer;text-align:left;color:#1f1b17;transition:background .1s" onmouseover="this.style.background='#f6ece6'" onmouseout="this.style.background='none'"><span style="font-size:11px;opacity:.4">@</span>${a}</button>`).join('');
+}
+function renderAgentDropdownItems() {
+  const c = document.getElementById('agent-dropdown-items');
+  c.innerHTML = AGENTS.map(a => `<button onclick="setAgent('${a}');document.getElementById('agent-dropdown').style.display='none'" style="width:100%;display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;background:none;border:none;cursor:pointer;text-align:left;transition:background .1s" onmouseover="this.style.background='#f6ece6'" onmouseout="this.style.background='none'"><span style="font-size:11px;opacity:.4">@</span>${a}</button>`).join('');
+}
+function toggleAgentMenu() {
+  const m = document.getElementById('agent-menu');
+  m.style.display = m.style.display === 'none' ? 'block' : 'none';
+}
+function toggleAgentDropdown() {
+  const d = document.getElementById('agent-dropdown');
+  d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#agent-menu') && !e.target.closest('[onclick*="toggleAgentMenu"]')) document.getElementById('agent-menu').style.display = 'none';
+  if (!e.target.closest('#agent-dropdown') && !e.target.closest('[onclick*="toggleAgentDropdown"]')) document.getElementById('agent-dropdown').style.display = 'none';
+});
+
+// Messages
+function renderMessages() {
+  const list = document.getElementById('message-list');
+  const empty = document.getElementById('empty-state');
+  if (!messages.length && !isTyping) { empty.style.display = 'flex'; while(list.children.length > 1) list.removeChild(list.lastChild); return; }
+  empty.style.display = 'none';
+  while(list.children.length > 1) list.removeChild(list.lastChild);
+  messages.forEach(m => list.appendChild(buildMessage(m)));
+  if (isTyping) list.appendChild(buildTyping());
+  list.scrollTop = list.scrollHeight;
+}
+function buildMessage(m) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = `display:flex;gap:12px;${m.role === 'user' ? 'justify-content:flex-end' : 'justify-content:flex-start'}`;
+  const maxW = 'max-width:80%';
+  if (m.role === 'user') {
+    wrap.innerHTML = `
+      <div style="${maxW};display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        ${m.skill ? `<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:9999px;font-size:12px;font-weight:700;background:#f0e6e0;border:1px solid #eae1db;color:#0d2678">@${m.skill}</span>` : ''}
+        <div class="msg-user"><p style="white-space:pre-wrap;word-break:break-word">${escHtml(m.content)}</p></div>
+        <span style="font-size:11px;color:#757683">${fmtTime(m.created_at)}</span>
+      </div>
+      <div class="avatar-sm" style="background:#2a3e8f">U</div>`;
+  } else {
+    const cls = m.isError ? 'msg-error' : 'msg-ai';
+    wrap.innerHTML = `
+      <div class="avatar-sm" style="background:#0d2678">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div style="${maxW};display:flex;flex-direction:column;gap:4px">
+        <div class="${cls}" style="line-height:1.65">${renderMarkdown(m.content)}</div>
+        <span style="font-size:11px;color:#757683">${fmtTime(m.created_at)}</span>
+      </div>`;
+  }
+  return wrap;
+}
+function buildTyping() {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;gap:12px;justify-content:flex-start;align-items:flex-start';
+  wrap.innerHTML = `<div class="avatar-sm" style="background:#0d2678"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+  <div class="msg-ai" style="display:flex;align-items:center;gap:5px"><span class="typing-dot" style="animation-delay:0s"></span><span class="typing-dot" style="animation-delay:.2s"></span><span class="typing-dot" style="animation-delay:.4s"></span></div>`;
+  return wrap;
+}
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function fmtTime(d) { if (!d) return ''; try { return new Date(d).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); } catch{return '';} }
+function renderMarkdown(s) {
+  if (!s) return '';
+  let h = escHtml(s);
+  h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  h = h.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  h = h.replace(/`(.+?)`/g, '<code style="background:rgba(13,38,120,.07);padding:2px 5px;border-radius:3px;font-size:.875em;color:#0d2678;font-family:monospace">$1</code>');
+  h = h.replace(/\n/g, '<br>');
+  return h;
+}
+
+// Sending
+const MOCK_REPLIES = [
+  'I\'ve analyzed your CRM data. **Sales are up 12% this quarter**, with your top 3 accounts driving 60% of revenue. I recommend prioritizing *renewal conversations* with Acme Corp and TechFlow before month end.',
+  'Based on engagement patterns, I\'ve identified **3 at-risk accounts**: \n• Globex Corp (no activity 45 days)\n• Initech (support tickets up 3×)\n• MegaCorp (usage dropped 40%)\n\nWould you like me to draft outreach templates?',
+  'Here\'s a summary of last week\'s newsletter performance: **Open rate 38%** (industry avg 21%), click-through **4.2%**. Your top-performing subject line was "Q3 insights you can\'t miss". I\'d recommend A/B testing the send time — currently 9am Tuesday.',
+  'I\'ve pulled the latest Xero data. **Outstanding invoices total $42,600** across 8 clients. 3 invoices are overdue by 30+ days. I can generate reminder emails for each — want me to draft those?',
+  'Great question! Based on your CRM data, I recommend focusing on **upsell opportunities** with your existing top 10 accounts before acquiring new leads. Your win rate on upsells is 68% vs 24% for new business.',
+];
+let replyIdx = 0;
+
+function quickSend(text) { document.getElementById('chat-input').value = text; autoResize(document.getElementById('chat-input')); updateSendBtn(); sendMsg(); }
+function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || isTyping) return;
+  const session = sessions.find(s => s.id === activeSessionId);
+  if (session && session.title === 'New Chat') {
+    session.title = text.slice(0, 32) + (text.length > 32 ? '…' : '');
+    document.getElementById('chat-title').textContent = session.title;
+    renderSessionList();
+  }
+  messages.push({ role: 'user', content: text, skill: currentAgent, created_at: new Date().toISOString() });
+  if (session) session.messages = messages;
+  input.value = ''; input.style.height = 'auto'; isTyping = true; updateSendBtn();
+  renderMessages();
+  setTimeout(() => {
+    isTyping = false;
+    const reply = MOCK_REPLIES[replyIdx % MOCK_REPLIES.length]; replyIdx++;
+    messages.push({ role: 'assistant', content: reply, created_at: new Date().toISOString() });
+    if (session) session.messages = messages;
+    renderMessages();
+    updateSendBtn();
+  }, 1200 + Math.random() * 600);
+}
+function updateSendBtn() {
+  const btn = document.getElementById('send-btn');
+  const hasContent = document.getElementById('chat-input').value.trim().length > 0;
+  btn.disabled = isTyping || !hasContent;
+}
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 180) + 'px'; updateSendBtn(); }
+function handleInputKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+function handleAtTrigger(el) { /* @ skill selector hook point */ }
+function toggleMic() { /* speech recognition hook */ }
+</script>
+</body>
+</html>

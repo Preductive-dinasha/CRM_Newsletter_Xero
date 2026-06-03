@@ -127,7 +127,7 @@ export default function SignupPage() {
           "radial-gradient(at 0% 0%, rgba(13,38,120,0.06) 0px, transparent 55%), radial-gradient(at 100% 100%, rgba(0,97,162,0.06) 0px, transparent 55%)",
       }}
     >
-      <div className="w-full max-w-[440px] flex flex-col items-center">
+      <div className="w-full max-w-[440px] flex flex-col items-center fade-up">
         <header className="mb-9 flex flex-col items-center text-center">
           <div className="w-20 h-20 rounded-[32px] bg-[#0d2678] flex items-center justify-center mb-4 shadow-lg">
             <MessageSquare size={32} strokeWidth={2.2} className="text-white" />
@@ -138,7 +138,7 @@ export default function SignupPage() {
           <p className="text-sm mt-1.5 text-[#454651]">Join Pai to get started</p>
         </header>
 
-        <section className="glass-panel w-full rounded-xl p-9 shadow-sm">
+        <section className="glass-panel w-full rounded-2xl p-9 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <div className="p-3.5 rounded-md text-sm bg-[#ffdad6] text-[#ba1a1a] border border-[#ffdad6]">
@@ -148,7 +148,7 @@ export default function SignupPage() {
 
             <div className="flex gap-3">
               <div className="flex-1 space-y-2">
-                <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">First name</label>
+                <label className="block text-[13px] font-bold text-[#1f1b17] ml-0.5">First name</label>
                 <input
                   type="text"
                   value={form.f_name}
@@ -160,7 +160,7 @@ export default function SignupPage() {
                 />
               </div>
               <div className="flex-1 space-y-2">
-                <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">Last name</label>
+                <label className="block text-[13px] font-bold text-[#1f1b17] ml-0.5">Last name</label>
                 <input
                   type="text"
                   value={form.l_name}
@@ -174,7 +174,7 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">Email</label>
+              <label className="block text-[13px] font-bold text-[#1f1b17] ml-0.5">Email</label>
               <input
                 type="email"
                 value={form.email}
@@ -187,7 +187,7 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">
+              <label className="block text-[13px] font-bold text-[#1f1b17] ml-0.5">
                 Company{" "}
                 <span className="font-normal text-[#757683]">(optional)</span>
               </label>
@@ -202,7 +202,7 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">Password</label>
+              <label className="block text-[13px] font-bold text-[#1f1b17] ml-0.5">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -226,7 +226,7 @@ export default function SignupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">Confirm password</label>
+              <label className="block text-[13px] font-bold text-[#1f1b17] ml-0.5">Confirm password</label>
               <div className="relative">
                 <input
                   type={showConfirm ? "text" : "password"}

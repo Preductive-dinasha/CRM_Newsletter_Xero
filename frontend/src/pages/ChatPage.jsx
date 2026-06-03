@@ -216,7 +216,11 @@ export default function ChatPage() {
           <AgentBadge agent={agent} />
         </header>
 
-        <MessageList messages={messages} isTyping={isTyping} />
+        <MessageList
+          messages={messages}
+          isTyping={isTyping}
+          onQuickSend={(text) => handleSend({ message: text, skill: agent })}
+        />
         <MessageInput
           onSend={handleSend}
           disabled={isTyping}

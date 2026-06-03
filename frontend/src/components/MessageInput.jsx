@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Paperclip, Mic, Send, ChevronDown, FileText, X } from "lucide-react";
+import { Paperclip, Mic, Send, ChevronDown, FileText, X, Database } from "lucide-react";
 import SkillSelector from "./SkillSelector";
 import useSpeech from "../hooks/useSpeech";
 
@@ -169,9 +169,28 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
 
   const hasContent = text.trim() || file;
 
+  const quickChips = [
+    { label: "🔗 Connect Data", agent: "CRM" },
+    { label: "📄 Summarize Activity", agent: "Newsletter" },
+    { label: "👤 Find Contacts", agent: "Xero" },
+  ];
+
   return (
     <div className="px-4 sm:px-6 md:px-10 pb-6 pt-3.5 flex-shrink-0 bg-[#fff8f5] border-t border-[#eae1db]">
       <div className="w-full relative">
+        <div className="flex gap-2 mb-2.5 overflow-x-auto pb-0.5 scrollbar-hide">
+          {quickChips.map((chip) => (
+            <button
+              key={chip.agent}
+              type="button"
+              onClick={() => onAgentChange && onAgentChange(chip.agent)}
+              className="inline-flex items-center gap-1 whitespace-nowrap px-3 py-1 rounded-full text-[11px] font-bold tracking-[0.03em] bg-[#f0e6e0] border border-[#eae1db] text-[#0d2678] hover:bg-[#eae1db] transition-colors duration-150"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+
         <div
           className="relative group"
           onDragOver={(e) => e.preventDefault()}
@@ -185,8 +204,20 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
               </div>
             )}
 
+            <div className="flex items-center justify-between gap-2 px-3.5 py-1.5 bg-[#fcf2ec] border-b border-[#eae1db]/60 rounded-t-[22px]">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[5px] bg-[#f0e6e0] border border-[#eae1db]">
+                  <Database size={13} className="text-[#0061a2]" strokeWidth={2} />
+                  <span className="text-[11px] font-bold text-[#454651] truncate">{agent || "General"}</span>
+                </span>
+                <span className="w-1 h-1 rounded-full bg-[#c5c5d3] flex-shrink-0" />
+                <span className="text-[11px] text-[#757683] truncate">v2.4 Cognitive Model</span>
+              </div>
+              <span className="text-[10px] font-bold tracking-[0.1em] text-[#757683] flex-shrink-0">AI PROCESSING READY</span>
+            </div>
+
             {file && (
-              <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 bg-[#fcf2ec] border-b border-[#eae1db] rounded-t-[22px]">
+              <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 bg-[#fcf2ec] border-b border-[#eae1db]">
                 <FilePreview file={file} onRemove={() => setFile(null)} />
               </div>
             )}

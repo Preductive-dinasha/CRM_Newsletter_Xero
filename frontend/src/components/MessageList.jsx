@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { MessageSquare, FileText } from "lucide-react";
+import { MessageSquare, FileText, BarChart3, AlertCircle } from "lucide-react";
 import { SkillBadge } from "./SkillSelector";
 
 function PaiAvatar() {
@@ -111,7 +111,22 @@ function TypingIndicator() {
   );
 }
 
-export default function MessageList({ messages, isTyping }) {
+const SUGGESTIONS = [
+  {
+    title: "Analyze last quarter sales",
+    desc: "Generate a performance report from CRM data.",
+    Icon: BarChart3,
+    color: "#0061a2",
+  },
+  {
+    title: "Identify at-risk accounts",
+    desc: "Scan engagement metrics for churn risks.",
+    Icon: AlertCircle,
+    color: "#5cadfe",
+  },
+];
+
+export default function MessageList({ messages, isTyping, onQuickSend }) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -130,6 +145,21 @@ export default function MessageList({ messages, isTyping }) {
               How can I help you?
             </h3>
             <p className="text-sm text-[#757683]">Select an agent below, then type your message</p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-7 w-full max-w-[480px]">
+              {SUGGESTIONS.map(({ title, desc, Icon, color }) => (
+                <button
+                  key={title}
+                  type="button"
+                  onClick={() => onQuickSend && onQuickSend(title)}
+                  className="flex flex-col items-start text-left p-5 bg-white border border-[#eae1db] rounded-2xl cursor-pointer transition-all duration-200 hover:border-[#b8c3ff] hover:bg-[#fcf2ec]"
+                >
+                  <Icon size={20} strokeWidth={2} className="mb-2.5" style={{ color }} />
+                  <span className="text-[13px] font-bold text-[#0d2678] mb-1">{title}</span>
+                  <span className="text-xs text-[#757683]/70 leading-relaxed">{desc}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
