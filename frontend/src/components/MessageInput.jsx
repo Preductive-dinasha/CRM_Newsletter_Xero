@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Paperclip, Mic, Send, ChevronDown, FileText, X, Database } from "lucide-react";
+import { Paperclip, Mic, Send, ChevronDown, FileText, X } from "lucide-react";
 import SkillSelector from "./SkillSelector";
 import useSpeech from "../hooks/useSpeech";
 
@@ -36,6 +36,9 @@ function AgentDropdown({ agent, onSelect, skills }) {
 
       {open && (
         <div className="absolute bottom-full mb-1.5 left-0 z-50 rounded-lg shadow-lg border border-[#eae1db] bg-white overflow-hidden min-w-36">
+          <div className="px-3.5 py-2 border-b border-[#eae1db] bg-[#fcf2ec]">
+            <p className="text-xs font-semibold text-[#454651] uppercase tracking-wider">Skills</p>
+          </div>
           <div className="py-1.5">
             {options.map((opt) => (
               <button
@@ -77,7 +80,11 @@ function FilePreview({ file, onRemove }) {
   if (thumb) {
     return (
       <div className="relative inline-flex">
-        <img src={thumb} alt="attachment preview" className="h-12 w-12 rounded-md object-cover border-[1.5px] border-[#eae1db]" />
+        <img
+          src={thumb}
+          alt="attachment preview"
+          className="h-12 w-12 rounded-md object-cover border-[1.5px] border-[#eae1db]"
+        />
         <button
           type="button"
           onClick={onRemove}
@@ -93,7 +100,11 @@ function FilePreview({ file, onRemove }) {
     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff]">
       <FileText size={12} />
       {file.name}
-      <button type="button" onClick={onRemove} className="hover:opacity-70 transition-opacity leading-none ml-0.5">
+      <button
+        type="button"
+        onClick={onRemove}
+        className="hover:opacity-70 transition-opacity leading-none ml-0.5"
+      >
         <X size={11} strokeWidth={2.5} />
       </button>
     </span>
@@ -169,59 +180,59 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
 
   const hasContent = text.trim() || file;
 
-  const quickChips = [
-    { label: "🔗 Connect Data", agent: "CRM" },
-    { label: "📄 Summarize Activity", agent: "Newsletter" },
-    { label: "👤 Find Contacts", agent: "Xero" },
-  ];
-
   return (
     <div className="px-4 sm:px-6 md:px-10 pb-6 pt-3.5 flex-shrink-0 bg-[#fff8f5] border-t border-[#eae1db]">
       <div className="w-full relative">
-        <div className="flex gap-2 mb-2.5 overflow-x-auto pb-0.5 scrollbar-hide">
-          {quickChips.map((chip) => (
-            <button
-              key={chip.agent}
-              type="button"
-              onClick={() => onAgentChange && onAgentChange(chip.agent)}
-              className="inline-flex items-center gap-1 whitespace-nowrap px-3 py-1 rounded-full text-[11px] font-bold tracking-[0.03em] bg-[#f0e6e0] border border-[#eae1db] text-[#0d2678] hover:bg-[#eae1db] transition-colors duration-150"
-            >
-              {chip.label}
-            </button>
-          ))}
-        </div>
-
         <div
           className="relative group"
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
+          {/* Glow on focus */}
           <div className="absolute -inset-0.5 bg-gradient-to-r from-[#0d2678] to-[#0061a2] rounded-[22px] opacity-0 group-focus-within:opacity-10 blur transition duration-300 pointer-events-none" />
+
           <div className="relative rounded-[22px] bg-white border border-[#eae1db] shadow-sm ring-1 ring-black/[0.03]">
+
+            {/* @ skill selector popup */}
             {atQuery !== null && (
               <div className="absolute bottom-full left-0 w-full z-10">
-                <SkillSelector query={atQuery} onSelect={handleSkillSelect} onClose={() => setAtQuery(null)} />
+                <SkillSelector
+                  query={atQuery}
+                  onSelect={handleSkillSelect}
+                  onClose={() => setAtQuery(null)}
+                  skills={skills}
+                />
               </div>
             )}
 
-            <div className="flex items-center justify-between gap-2 px-3.5 py-1.5 bg-[#fcf2ec] border-b border-[#eae1db]/60 rounded-t-[22px]">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[5px] bg-[#f0e6e0] border border-[#eae1db]">
-                  <Database size={13} className="text-[#0061a2]" strokeWidth={2} />
-                  <span className="text-[11px] font-bold text-[#454651] truncate">{agent || "General"}</span>
-                </span>
-                <span className="w-1 h-1 rounded-full bg-[#c5c5d3] flex-shrink-0" />
-                <span className="text-[11px] text-[#757683] truncate">v2.4 Cognitive Model</span>
-              </div>
-              <span className="text-[10px] font-bold tracking-[0.1em] text-[#757683] flex-shrink-0">AI PROCESSING READY</span>
-            </div>
-
+            {/* File preview strip */}
             {file && (
-              <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 bg-[#fcf2ec] border-b border-[#eae1db]">
+              <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 bg-[#fcf2ec] border-b border-[#eae1db] rounded-t-[22px]">
                 <FilePreview file={file} onRemove={() => setFile(null)} />
               </div>
             )}
 
+            {/* Context header */}
+            <div className="flex items-center justify-between px-4 py-2 bg-[#fcf2ec] border-b border-[#eae1db]/60 rounded-t-[22px]">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 bg-[#f0e6e0] px-2 py-0.5 rounded-md border border-[#eae1db] cursor-pointer hover:bg-[#eae1db] transition-colors">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#0061a2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                  </svg>
+                  <span className="text-[11px] font-bold text-[#454651] uppercase tracking-wide">Global CRM</span>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#757683" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                </div>
+                <div className="w-1 h-1 rounded-full bg-[#c5c5d3]" />
+                <span className="text-[11px] font-bold text-[#757683]">v2.4 Cognitive Model</span>
+              </div>
+              <span className="text-[10px] font-bold text-[#757683] uppercase tracking-widest">AI Processing Ready</span>
+            </div>
+
+            {/* Textarea */}
             <textarea
               ref={textareaRef}
               value={text}
@@ -231,15 +242,18 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
               placeholder="Message Pai… (@ to pick a skill)"
               disabled={disabled}
               rows={1}
-              className="w-full resize-none bg-transparent px-4.5 py-4 text-[14px] outline-none disabled:opacity-50 text-[#1f1b17] leading-relaxed overflow-auto max-h-[200px] placeholder:text-[#757683]"
+              className="w-full resize-none bg-transparent px-4 py-4 text-[14px] outline-none disabled:opacity-50 text-[#1f1b17] leading-relaxed overflow-auto max-h-[200px] placeholder:text-[#757683]"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               onInput={(e) => {
                 e.target.style.height = "auto";
                 e.target.style.height = Math.min(e.target.scrollHeight, 200) + "px";
               }}
             />
 
+            {/* Toolbar footer */}
             <div className="flex items-center justify-between px-3 py-2.5 bg-[#fcf2ec] border-t border-[#eae1db] rounded-b-[22px]">
               <div className="flex items-center gap-1">
+                {/* Attach */}
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
@@ -256,6 +270,7 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
                   accept="image/*,.pdf,.txt,.csv,.docx,.xlsx"
                 />
 
+                {/* Mic */}
                 <button
                   type="button"
                   onClick={speech.toggle}
@@ -265,7 +280,13 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
                       ? "text-[#0d2678] bg-[#dde1ff]"
                       : "text-[#757683] hover:text-[#0d2678] hover:bg-[#f0e6e0]"
                   }`}
-                  title={!speech.supported ? "Voice input not supported" : speech.listening ? "Stop recording" : "Voice input"}
+                  title={
+                    !speech.supported
+                      ? "Voice input not supported"
+                      : speech.listening
+                      ? "Stop recording"
+                      : "Voice input"
+                  }
                 >
                   {speech.listening && (
                     <span className="absolute inset-0 rounded-md animate-mic-pulse bg-[#0d2678]/10 pointer-events-none" />
@@ -277,9 +298,15 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
 
                 <span className="text-[#c5c5d3] text-xs mx-0.5">|</span>
 
-                <AgentDropdown agent={agent || "General"} onSelect={onAgentChange || (() => {})} skills={skills} />
+                {/* Agent selector */}
+                <AgentDropdown
+                  agent={agent || "General"}
+                  onSelect={onAgentChange || (() => {})}
+                  skills={skills}
+                />
               </div>
 
+              {/* Send button */}
               <button
                 type="button"
                 onClick={handleSend}
@@ -295,6 +322,7 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
             </div>
           </div>
         </div>
+
         <p className="text-center text-xs mt-3 text-[#757683]">
           Enter to send · Shift+Enter for new line · @ to pick a skill
         </p>
