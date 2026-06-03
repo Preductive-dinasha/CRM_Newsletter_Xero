@@ -1,0 +1,2 @@
+- [Git writes blocked + backup recovery](git-writes-blocked-and-backup-recovery.md) — agent can't fetch/merge/push/commit; recover lost files via read-only `git archive <ref>|tar`, reconcile via user Shell
+- [Frontend deps install location](frontend-deps-install-location.md) — install React-coupled libs (lucide-react etc.) into `frontend/`, never repo root, to avoid dual-React "Invalid hook call"

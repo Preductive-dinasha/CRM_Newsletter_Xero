@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { MessageSquare, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { login } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 
-const inputCls = "w-full px-4 py-3 rounded-[18px] border border-[#E4E4E7] bg-[#F8F8F8] text-sm text-[#111827] outline-none transition duration-150 ease-out focus:border-black focus:shadow-[0_0_0_3px_rgba(0,0,0,0.08)]";
+const inputCls =
+  "w-full pl-11 pr-4 py-3.5 bg-white/60 border border-[#c5c5d3] rounded-md text-sm text-[#1f1b17] outline-none transition-all duration-200 focus:border-[#0d2678] focus:ring-2 focus:ring-[#0d2678]/15 placeholder:text-[#757683]";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -29,100 +31,112 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F8F8F8]">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-[22px] mb-4 bg-black">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-            </svg>
+    <div
+      className="min-h-screen flex items-center justify-center px-5 py-10 font-body"
+      style={{
+        backgroundColor: "#fff8f5",
+        backgroundImage:
+          "radial-gradient(at 0% 0%, rgba(13,38,120,0.06) 0px, transparent 55%), radial-gradient(at 100% 100%, rgba(0,97,162,0.06) 0px, transparent 55%)",
+      }}
+    >
+      <div className="w-full max-w-[440px] flex flex-col items-center">
+        <header className="mb-9 flex flex-col items-center text-center">
+          <div className="w-16 h-16 rounded-lg bg-[#0d2678] flex items-center justify-center mb-4 shadow-lg">
+            <MessageSquare size={28} strokeWidth={2.2} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-black">Welcome to Preddi</h1>
-          <p className="text-sm mt-1 text-gray-500">Sign in to continue</p>
-        </div>
+          <h1 className="text-[28px] font-bold text-[#0d2678] leading-tight" style={{ fontFamily: "'Outfit', sans-serif" }}>
+            Welcome to Pai
+          </h1>
+          <p className="text-sm mt-1.5 text-[#454651]">Sign in to continue</p>
+        </header>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-[28px] shadow-[0_24px_80px_rgba(15,23,42,0.08)] border border-[#E4E4E7] p-8">
-          {error && (
-            <div className="mb-4 p-3 rounded-lg text-sm bg-red-50 text-red-600 border border-red-200">
-              {error}
+        <section className="glass-panel w-full rounded-lg p-9 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-3.5 rounded-md text-sm bg-[#ffdad6] text-[#ba1a1a] border border-[#ffdad6]">
+                {error}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">Email</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-[#757683]">
+                  <Mail size={16} />
+                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  required
+                  autoComplete="email"
+                  className={inputCls}
+                />
+              </div>
             </div>
-          )}
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-1.5 text-black">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              required
-              autoComplete="email"
-              className={inputCls}
-            />
-          </div>
-
-          <div className="mb-2">
-            <label className="block text-sm font-medium mb-1.5 text-black">Password</label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                autoComplete="current-password"
-                className={inputCls}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                title={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
-                    <line x1="1" y1="1" x2="23" y2="23" />
-                  </svg>
-                ) : (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-              </button>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center ml-0.5">
+                <label className="block text-sm font-semibold text-[#1f1b17]">Password</label>
+                <button
+                  type="button"
+                  className="text-xs text-[#0061a2] hover:text-[#0d2678] transition-colors font-medium"
+                >
+                  Forgot password?
+                </button>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-[#757683]">
+                  <Lock size={16} />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  autoComplete="current-password"
+                  className={`${inputCls} pr-11`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-[#757683] hover:text-[#1f1b17] hover:bg-[#f0e6e0] transition-colors"
+                  title={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="flex justify-end mb-6">
             <button
-              type="button"
-              className="text-xs text-black hover:underline"
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-md text-white text-sm font-semibold bg-[#0d2678] hover:bg-[#0d2678]/90 active:scale-[0.99] transition-all duration-200 shadow-md disabled:opacity-60 group"
             >
-              Forgot password?
+              {loading ? "Signing in…" : "Sign in"}
+              {!loading && <ArrowRight size={16} strokeWidth={2.5} className="group-hover:translate-x-0.5 transition-transform" />}
             </button>
-          </div>
+          </form>
+        </section>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-xl text-white text-sm font-semibold bg-black hover:bg-[#27272A] transition duration-150 ease-out disabled:opacity-60"
-          >
-            {loading ? "Signing in…" : "Sign in"}
-          </button>
-
-          <p className="text-center text-sm mt-4 text-gray-500">
+        <footer className="mt-8 text-center">
+          <p className="text-sm text-[#454651]">
             Don't have an account?{" "}
             <button
               type="button"
               onClick={() => navigate("/signup")}
-              className="font-medium text-black hover:underline"
+              className="font-bold text-[#0d2678] hover:underline underline-offset-4 ml-0.5"
             >
               Sign up
             </button>
           </p>
-        </form>
+        </footer>
       </div>
+
+      <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#0d2678]/5 blur-[120px] rounded-full -z-10 pointer-events-none" />
+      <div className="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-[#0061a2]/8 blur-[100px] rounded-full -z-10 pointer-events-none" />
     </div>
   );
 }
