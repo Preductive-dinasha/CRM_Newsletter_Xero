@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { Menu } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import MessageList from "../components/MessageList";
 import MessageInput from "../components/MessageInput";
@@ -10,13 +9,30 @@ import { createSession } from "../api/sessions";
 const AGENT_LS_KEY = "preddi_last_agent";
 const MOBILE_BREAKPOINT = 768;
 
+const AGENT_COLORS = {
+  CRM: { dot: "bg-black", badge: "bg-[#F4F4F5] text-[#18181B] border border-[#E4E4E7]" },
+  Newsletter: { dot: "bg-black", badge: "bg-[#F4F4F5] text-[#18181B] border border-[#E4E4E7]" },
+  Xero: { dot: "bg-black", badge: "bg-[#F4F4F5] text-[#18181B] border border-[#E4E4E7]" },
+};
+
 function AgentBadge({ agent }) {
   if (!agent) return null;
+  const c = AGENT_COLORS[agent] || { dot: "bg-black", badge: "bg-black/10 text-black border border-black/10" };
   return (
-    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-semibold tracking-wide bg-[#0d2678] text-white border border-[#2a3e8f]">
-      <span className="bg-[#5cadfe] animate-pulse w-2 h-2 rounded-full flex-shrink-0" />
+    <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide ${c.badge}`}>
+      <span className={`${c.dot} w-2.5 h-2.5 rounded-full`} />
       @{agent}
     </span>
+  );
+}
+
+function HamburgerIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
   );
 }
 
@@ -172,11 +188,11 @@ export default function ChatPage() {
   }, [activeSessionId, agent]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#fff8f5]">
+    <div className="flex h-screen overflow-hidden bg-[#F8F8F8]">
 
       {isMobile && sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-black/25"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -185,8 +201,8 @@ export default function ChatPage() {
         className={`
           flex-shrink-0 transition-all duration-300
           ${isMobile
-            ? `fixed inset-y-0 left-0 z-50 w-[300px] ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`
-            : sidebarOpen ? "w-[280px]" : "w-0 overflow-hidden"
+            ? `fixed inset-y-0 left-0 z-50 w-[320px] ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`
+            : sidebarOpen ? "w-[320px]" : "w-0 overflow-hidden"
           }
         `}
       >
@@ -200,16 +216,16 @@ export default function ChatPage() {
       </div>
 
       <div className="chat-container flex flex-col min-w-0">
-        <header className="flex-shrink-0 flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-4 bg-[#fff8f5]/80 backdrop-blur-md border-b border-[#eae1db] shadow-sm">
+        <header className="flex-shrink-0 flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-4 bg-[#F8F8F8] shadow-sm border-b border-[#E4E4E7]">
           <button
             onClick={() => setSidebarOpen((v) => !v)}
-            className="p-2 rounded-md transition-all text-[#757683] hover:bg-[#f0e6e0] hover:text-[#0d2678] flex-shrink-0"
+            className="p-2 rounded-xl transition-all text-[#71717A] hover:bg-[#F4F4F5] hover:text-black flex-shrink-0"
             title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
           >
-            <Menu size={18} />
+            <HamburgerIcon />
           </button>
 
-          <h1 className="font-semibold text-sm sm:text-base truncate flex-1 text-[#1f1b17]" style={{ fontFamily: "'Outfit', sans-serif" }}>
+          <h1 className="font-semibold text-sm sm:text-base truncate flex-1 text-[#111827]">
             {sessionTitle}
           </h1>
 
