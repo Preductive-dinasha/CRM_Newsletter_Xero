@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MessageSquare, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import { MessageSquare, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { login } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 
 const inputCls =
-  "w-full pl-11 pr-4 py-3.5 bg-white/50 border border-[#c5c5d3] rounded-lg text-sm text-[#1f1b17] outline-none transition-all duration-200 focus:border-[#0d2678] focus:ring-2 focus:ring-[#0d2678]/20 placeholder:text-[#757683]";
+  "w-full px-4 py-3.5 bg-white/50 border border-[#c5c5d3] rounded-lg text-sm text-[#1f1b17] outline-none transition-all duration-200 focus:border-[#0d2678] focus:ring-2 focus:ring-[#0d2678]/20 placeholder:text-[#757683]";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -60,20 +60,15 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-[#1f1b17] ml-0.5">Email</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-[#757683]">
-                  <Mail size={16} />
-                </div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@company.com"
-                  required
-                  autoComplete="email"
-                  className={inputCls}
-                />
-              </div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@company.com"
+                required
+                autoComplete="email"
+                className={inputCls}
+              />
             </div>
 
             <div className="space-y-2">
@@ -87,9 +82,6 @@ export default function LoginPage() {
                 </button>
               </div>
               <div className="relative">
-                <div className="absolute inset-y-0 left-3.5 flex items-center pointer-events-none text-[#757683]">
-                  <Lock size={16} />
-                </div>
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
