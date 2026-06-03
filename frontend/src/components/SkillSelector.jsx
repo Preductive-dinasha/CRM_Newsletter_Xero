@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 
-const SKILL_CLS = "bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff]";
+const SKILL_CLS = "bg-[#f0e6e0] text-[#0d2678] border border-[#eae1db]";
 
 export function SkillChip({ skill, onRemove }) {
   return (
-    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold ${SKILL_CLS}`}>
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${SKILL_CLS}`}>
       @{skill}
       {onRemove && (
         <button
@@ -22,7 +22,7 @@ export function SkillChip({ skill, onRemove }) {
 
 export function SkillBadge({ skill }) {
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-[12px] font-semibold ${SKILL_CLS}`}>
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-semibold ${SKILL_CLS}`}>
       @{skill}
     </span>
   );

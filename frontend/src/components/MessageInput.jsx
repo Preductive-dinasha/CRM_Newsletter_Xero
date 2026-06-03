@@ -27,7 +27,7 @@ function AgentDropdown({ agent, onSelect, skills }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1 px-3 py-1.5 rounded-md text-[12px] font-semibold transition duration-150 ease-out bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff] hover:bg-[#b8c3ff]/40"
+        className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[12px] font-semibold transition duration-150 ease-out bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff] hover:bg-[#b8c3ff]/40"
         title="Select agent"
       >
         @{agent}
@@ -90,7 +90,7 @@ function FilePreview({ file, onRemove }) {
   }
 
   return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff]">
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-[#dde1ff] text-[#0d2678] border border-[#b8c3ff]">
       <FileText size={12} />
       {file.name}
       <button type="button" onClick={onRemove} className="hover:opacity-70 transition-opacity leading-none ml-0.5">
@@ -177,8 +177,8 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
           onDragOver={(e) => e.preventDefault()}
           onDrop={handleDrop}
         >
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-[#0d2678] to-[#0061a2] rounded-lg opacity-0 group-focus-within:opacity-10 blur transition duration-300 pointer-events-none" />
-          <div className="relative rounded-lg bg-white border border-[#eae1db] shadow-sm ring-1 ring-black/[0.03]">
+          <div className="absolute -inset-0.5 bg-gradient-to-r from-[#0d2678] to-[#0061a2] rounded-[22px] opacity-0 group-focus-within:opacity-10 blur transition duration-300 pointer-events-none" />
+          <div className="relative rounded-[22px] bg-white border border-[#eae1db] shadow-sm ring-1 ring-black/[0.03]">
             {atQuery !== null && (
               <div className="absolute bottom-full left-0 w-full z-10">
                 <SkillSelector query={atQuery} onSelect={handleSkillSelect} onClose={() => setAtQuery(null)} />
@@ -186,7 +186,7 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
             )}
 
             {file && (
-              <div className="flex flex-wrap items-center gap-2 px-4 pt-3.5">
+              <div className="flex flex-wrap items-center gap-2 px-4 py-2.5 bg-[#fcf2ec] border-b border-[#eae1db] rounded-t-[22px]">
                 <FilePreview file={file} onRemove={() => setFile(null)} />
               </div>
             )}
@@ -207,7 +207,7 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
               }}
             />
 
-            <div className="flex items-center justify-between px-3 pb-3">
+            <div className="flex items-center justify-between px-3 py-2.5 bg-[#fcf2ec] border-t border-[#eae1db] rounded-b-[22px]">
               <div className="flex items-center gap-1">
                 <button
                   type="button"
@@ -253,9 +253,9 @@ export default function MessageInput({ onSend, disabled, agent, onAgentChange, s
                 type="button"
                 onClick={handleSend}
                 disabled={disabled || !hasContent}
-                className={`h-9 w-9 rounded-md transition duration-150 ease-out disabled:opacity-30 flex items-center justify-center ${
+                className={`h-10 w-10 rounded-xl transition-all duration-150 ease-out disabled:opacity-30 flex items-center justify-center ${
                   hasContent && !disabled
-                    ? "bg-[#0d2678] text-white hover:bg-[#0d2678]/90 active:scale-[0.97] shadow-sm"
+                    ? "bg-[#0d2678] text-white hover:bg-[#0d2678]/90 hover:scale-105 active:scale-95 shadow-sm"
                     : "bg-[#eae1db] text-[#757683]"
                 }`}
               >

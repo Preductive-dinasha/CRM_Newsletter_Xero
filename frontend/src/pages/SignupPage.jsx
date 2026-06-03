@@ -67,7 +67,7 @@ function PasswordStrength({ password }) {
 }
 
 const inputCls =
-  "w-full px-4 py-3.5 bg-white/60 border border-[#c5c5d3] rounded-md text-sm text-[#1f1b17] outline-none transition-all duration-200 focus:border-[#0d2678] focus:ring-2 focus:ring-[#0d2678]/15 placeholder:text-[#757683]";
+  "w-full px-4 py-3.5 bg-white/50 border border-[#c5c5d3] rounded-lg text-sm text-[#1f1b17] outline-none transition-all duration-200 focus:border-[#0d2678] focus:ring-2 focus:ring-[#0d2678]/20 placeholder:text-[#757683]";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -129,8 +129,8 @@ export default function SignupPage() {
     >
       <div className="w-full max-w-[440px] flex flex-col items-center">
         <header className="mb-9 flex flex-col items-center text-center">
-          <div className="w-16 h-16 rounded-lg bg-[#0d2678] flex items-center justify-center mb-4 shadow-lg">
-            <MessageSquare size={28} strokeWidth={2.2} className="text-white" />
+          <div className="w-20 h-20 rounded-[32px] bg-[#0d2678] flex items-center justify-center mb-4 shadow-lg">
+            <MessageSquare size={32} strokeWidth={2.2} className="text-white" />
           </div>
           <h1 className="text-[28px] font-bold text-[#0d2678] leading-tight" style={{ fontFamily: "'Outfit', sans-serif" }}>
             Create your account
@@ -138,7 +138,7 @@ export default function SignupPage() {
           <p className="text-sm mt-1.5 text-[#454651]">Join Pai to get started</p>
         </header>
 
-        <section className="glass-panel w-full rounded-lg p-9 shadow-sm">
+        <section className="glass-panel w-full rounded-xl p-9 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <div className="p-3.5 rounded-md text-sm bg-[#ffdad6] text-[#ba1a1a] border border-[#ffdad6]">
@@ -254,7 +254,7 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-md text-white text-sm font-semibold bg-[#0d2678] hover:bg-[#0d2678]/90 active:scale-[0.99] transition-all duration-200 shadow-md disabled:opacity-60 group mt-2"
+              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-lg text-white text-sm font-semibold bg-[#0d2678] hover:bg-[#0d2678]/90 active:scale-[0.98] transition-all duration-200 shadow-md disabled:opacity-60 group mt-2"
             >
               {loading ? "Creating account…" : "Create account"}
               {!loading && <ArrowRight size={16} strokeWidth={2.5} className="group-hover:translate-x-0.5 transition-transform" />}
